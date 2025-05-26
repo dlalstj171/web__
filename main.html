@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>지역 소개 페이지</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #f1fcd7;
+    }
+
+    .hero-container {
+      display: flex;
+      width: 400vw;
+      height: 85vh;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .hero {
+      flex: 0 0 100vw;
+      height: 85vh;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      background-color: #f1fcd7;
+    }
+
+    .hero-image img {
+      width: 420px;
+      height: auto;
+      border-radius: 20px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .carousel-indicator {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      background-color: #e9f9b5;
+      border-top: 1px solid #cddfa2;
+    }
+
+    .carousel-indicator .indicator {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-size: 0.95rem;
+    }
+
+    .carousel-indicator button {
+      padding: 5px 10px;
+      border: 1px solid #aaa;
+      background: white;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 0.95rem;
+    }
+
+    nav a {
+      background-color: #52b788;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-left: 10px;
+      text-decoration: none;
+      transition: background-color 0.2s ease;
+    }
+
+    nav a:hover {
+      background-color: #40916c;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo"><img src="img/logo.jpg" alt="사이트 로고" style="height: 60px;"></div>
+    <nav>
+      <ul>
+        <li><a href="main.html">홈</a></li>
+        <li><a href="region.html">지역</a></li>
+        <li><a href="#">자세히 보기</a></li>
+      </ul>
+    </nav>
+
+  </header>
+
+  <div class="hero-container" id="slider">
+    <section class="hero">
+      <div class="hero-text">
+        <span class="tag">달빛 아래 걷는 월영교와 함께,</span>
+        <h1>고택에서 쉬어가는<br>안동 1박 2일 코스</h1>
+        <a href="#" class="button">자세히 보기</a>
+      </div>
+      <div class="hero-image">
+        <img src="img/seoul/청계천.jpg" alt="안동 고택 사진">
+      </div>
+    </section>
+    <section class="hero">
+      <div class="hero-text">
+        <span class="tag">한옥과 벚꽃이 어우러진 봄날,</span>
+        <h1>전주에서 즐기는<br>감성 가득 하루 여행</h1>
+        <a href="#" class="button">자세히 보기</a>
+      </div>
+      <div class="hero-image">
+        <img src="img/jeonju_hanok.jpg" alt="전주 한옥마을 사진">
+      </div>
+    </section>
+    <section class="hero">
+      <div class="hero-text">
+        <span class="tag">푸른 바다와 해풍이 맞이하는,</span>
+        <h1>부산 해운대에서<br>즐기는 여름 바캉스</h1>
+        <a href="#" class="button">자세히 보기</a>
+      </div>
+      <div class="hero-image">
+        <img src="img/busan_beach.jpg" alt="부산 해운대 해변 사진">
+      </div>
+    </section>
+    <section class="hero">
+      <div class="hero-text">
+        <span class="tag">초록빛 숲과 맑은 계곡을 따라,</span>
+        <h1>강원도 평창에서<br>힐링 자연 여행</h1>
+        <a href="#" class="button">자세히 보기</a>
+      </div>
+      <div class="hero-image">
+        <img src="img/pyeongchang_valley.jpg" alt="강원도 평창 자연 사진">
+      </div>
+    </section>
+  </div>
+
+  <section class="carousel-indicator">
+    <div class="indicator">
+      <button onclick="prevSlide()">&larr;</button>
+      <span id="slide-indicator"><strong>1</strong> / 4</span>
+      <button onclick="nextSlide()">&rarr;</button>
+    </div>
+  </section>
+
+  <script>
+    let currentSlide = 0;
+    const totalSlides = 4;
+    const slider = document.getElementById('slider');
+    const indicator = document.getElementById('slide-indicator');
+
+    function updateSlide() {
+      slider.style.transform = `translateX(-${currentSlide * 100}vw)`;
+      indicator.innerHTML = `<strong>${currentSlide + 1}</strong> / ${totalSlides}`;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    updateSlide();
+  </script>
+</body>
+</html>
