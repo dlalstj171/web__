@@ -1,178 +1,220 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>지역 소개 페이지</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>국내 여행지 정보 사이트</title>
+  <link rel="stylesheet" href="style.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Noto Sans KR', sans-serif; background-color: #fff; color: #222; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid #eee;
     }
 
-    html, body {
+    .logo img { height: 40px; }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 24px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #222;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .carousel {
+      display: flex;
+      overflow: hidden;
+      position: relative;
+      margin: 40px auto;
+      max-width: 1000px;
+      aspect-ratio: 16 / 9;
+      border-radius: 12px;
+    }
+    .carousel-slide {
+      flex: 0 0 100%;
+      position: relative;
+    }
+
+    .carousel-slide img {
       width: 100%;
       height: 100%;
-      overflow-x: hidden;
-      font-family: 'Noto Sans KR', sans-serif;
-      background-color: #f1fcd7;
+      object-fit: cover;
+      border-radius: 12px;
     }
 
-    .hero-container {
+    .overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      font-size: 1rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .carousel-slide:hover .overlay {
+      opacity: 1;
+    }
+
+    .carousel-track {
       display: flex;
-      width: 400vw;
-      height: 85vh;
       transition: transform 0.5s ease-in-out;
+      width: 300%;
     }
 
-    .hero {
-      flex: 0 0 100vw;
-      height: 85vh;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 40px;
-      background-color: #f1fcd7;
-    }
 
-    .hero-image img {
-      width: 420px;
-      height: auto;
-      border-radius: 20px;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-    }
 
     .carousel-indicator {
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 16px;
-      background-color: #e9f9b5;
-      border-top: 1px solid #cddfa2;
-    }
-
-    .carousel-indicator .indicator {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      font-size: 0.95rem;
+      gap: 12px;
+      margin: 20px auto;
     }
 
     .carousel-indicator button {
-      padding: 5px 10px;
-      border: 1px solid #aaa;
-      background: white;
+      border: none;
+      background: #eee;
+      padding: 6px 10px;
+      border-radius: 6px;
       cursor: pointer;
-      border-radius: 5px;
+    }
+
+    .top-destinations {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .top-destinations h2 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .top-destinations p {
       font-size: 0.95rem;
+      color: #666;
+      margin-bottom: 30px;
     }
 
-    nav a {
-      background-color: #52b788;
-      color: white;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      margin-left: 10px;
-      text-decoration: none;
-      transition: background-color 0.2s ease;
+    .destination-grid {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+.destination-grid a {
+  text-align: center;
+  color: inherit;
+  text-decoration: none;
+}
+
+    .destination {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    nav a:hover {
-      background-color: #40916c;
+    .destination img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
   <header>
-    <div class="logo"><img src="img/logo.jpg" alt="사이트 로고" style="height: 60px;"></div>
+    <div class="logo"><img src="logo.jpg" alt="로고"></div>
     <nav>
       <ul>
-        <li><a href="main.html">홈</a></li>
-        <li><a href="region.html">지역</a></li>
-        <li><a href="#">자세히 보기</a></li>
+        <li><a href="main.html">| HOME |</a></li>
+        <li><a href="region.html">| 주요도시 |</a></li>
+        <li><a href="#">| 설명 |</a></li>
       </ul>
     </nav>
-
   </header>
 
-  <div class="hero-container" id="slider">
-    <section class="hero">
-      <div class="hero-text">
-        <span class="tag">달빛 아래 걷는 월영교와 함께,</span>
-        <h1>고택에서 쉬어가는<br>안동 1박 2일 코스</h1>
-        <a href="#" class="button">자세히 보기</a>
-      </div>
-      <div class="hero-image">
-        <img src="img/seoul/청계천.jpg" alt="안동 고택 사진">
-      </div>
-    </section>
-    <section class="hero">
-      <div class="hero-text">
-        <span class="tag">한옥과 벚꽃이 어우러진 봄날,</span>
-        <h1>전주에서 즐기는<br>감성 가득 하루 여행</h1>
-        <a href="#" class="button">자세히 보기</a>
-      </div>
-      <div class="hero-image">
-        <img src="img/jeonju_hanok.jpg" alt="전주 한옥마을 사진">
-      </div>
-    </section>
-    <section class="hero">
-      <div class="hero-text">
-        <span class="tag">푸른 바다와 해풍이 맞이하는,</span>
-        <h1>부산 해운대에서<br>즐기는 여름 바캉스</h1>
-        <a href="#" class="button">자세히 보기</a>
-      </div>
-      <div class="hero-image">
-        <img src="img/busan_beach.jpg" alt="부산 해운대 해변 사진">
-      </div>
-    </section>
-    <section class="hero">
-      <div class="hero-text">
-        <span class="tag">초록빛 숲과 맑은 계곡을 따라,</span>
-        <h1>강원도 평창에서<br>힐링 자연 여행</h1>
-        <a href="#" class="button">자세히 보기</a>
-      </div>
-      <div class="hero-image">
-        <img src="img/pyeongchang_valley.jpg" alt="강원도 평창 자연 사진">
-      </div>
-    </section>
+<section class="carousel">
+  <div class="carousel-track" id="carousel-track">
+    <div class="carousel-slide">
+      <img src="img/seoul/seoul.jpg" alt="서울">
+      <div class="overlay">대한민국의 수도, 전통과 현대가 공존하는 서울</div>
+    </div>
+    <div class="carousel-slide">
+      <img src="img/강원/강릉.jpg" alt="강릉">
+      <div class="overlay">동해 바다를 품은 강원도 강릉</div>
+    </div>
+    <div class="carousel-slide">
+      <img src="img/전남/담양.png" alt="담양">
+      <div class="overlay">대나무 숲으로 유명한 전라남도 담양</div>
+    </div>
+    <div class="carousel-slide">
+      <img src="img/제주/제주.jpg" alt="제주도">
+      <div class="overlay">푸른 바다와 오름이 펼쳐지는 제주도</div>
+    </div>
+  </div>
+</section>
+
+  <div class="carousel-indicator">
+    <button onclick="prevSlide()">◀</button>
+    <span id="slide-indicator">01 / 04</span>
+    <button onclick="nextSlide()">▶</button>
   </div>
 
-  <section class="carousel-indicator">
-    <div class="indicator">
-      <button onclick="prevSlide()">&larr;</button>
-      <span id="slide-indicator"><strong>1</strong> / 4</span>
-      <button onclick="nextSlide()">&rarr;</button>
-    </div>
-  </section>
+<section class="top-destinations">
+  <h2>TOP 3 여행지</h2>
+  <p>서울, 부산, 대전에서 만나는 다양한 매력</p>
+  <div class="destination-grid">
+    <a href="seoul.html" class="destination">
+      <img src="img/seoul/seoul.jpg" alt="서울">
+      <strong>서울</strong>
+    </a>
+    <a href="busan.html" class="destination">
+      <img src="img/busan/busan.jpg" alt="부산">
+      <strong>부산</strong>
+    </a>
+    <a href="daejeon.html" class="destination">
+      <img src="img/daejeon/daejeon.jpg" alt="대전">
+      <strong>대전</strong>
+    </a>
+  </div>
+</section>
 
   <script>
     let currentSlide = 0;
     const totalSlides = 4;
-    const slider = document.getElementById('slider');
+    const track = document.getElementById('carousel-track');
     const indicator = document.getElementById('slide-indicator');
 
     function updateSlide() {
-      slider.style.transform = `translateX(-${currentSlide * 100}vw)`;
-      indicator.innerHTML = `<strong>${currentSlide + 1}</strong> / ${totalSlides}`;
+      track.style.transform = `translateX(-${currentSlide * 100}%)`;
+      indicator.textContent = `${String(currentSlide + 1).padStart(2, '0')} / 04`;
     }
 
     function nextSlide() {
-      if (currentSlide < totalSlides - 1) {
-        currentSlide++;
-        updateSlide();
-      }
+      currentSlide = (currentSlide + 1) % totalSlides;
+      updateSlide();
     }
 
     function prevSlide() {
-      if (currentSlide > 0) {
-        currentSlide--;
-        updateSlide();
-      }
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      updateSlide();
     }
 
     updateSlide();
