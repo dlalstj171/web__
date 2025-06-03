@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>여행 후기</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+header {
+    background-color: #ccc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    border-bottom: 1px solid #ccc;
+}
+
+.logo img {
+  height: 40px;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 24px;
+}
+
+nav a {
+  text-decoration: none;
+  color: #222;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+    #wrapper {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      background-color: #ccc;
+      padding: 8px 80px;
+    }
+
+
+    #left-box, #right-box {
+      position: absolute;
+      top: 0;
+      width: 80px;
+      height: 100%;
+      background-color: #ccc;
+    }
+
+    #left-box {
+      left: 0;
+    }
+
+    #right-box {
+      right: 0;
+    }
+
+    #content-box {
+      width: 100%;
+      height: 100%;
+      background-color: #fefefe;
+      border-radius: 8px;
+      padding: 40px;
+      overflow-y: auto;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+    }
+
+    select, textarea {
+      display: block;
+      width: 100%;
+      margin-bottom: 20px;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100px;
+      padding: 10px;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 30px;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    #reviewContainer {
+      margin-top: 20px;
+    }
+
+    .card {
+      background-color: #f1f1f1;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .date-country {
+      font-size: 0.85rem;
+      color: #555;
+      margin-top: 10px;
+      text-align: right;
+    }
+    .input-box {
+  background-color: #f9f9f9;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  max-width: 600px;
+  margin: 0 auto 40px auto;
+}
+
+.input-box select,
+.input-box textarea {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  margin-bottom: 16px;
+  background-color: white;
+}
+
+.input-box textarea {
+  resize: vertical;
+}
+
+.input-box button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  background-color: #868585;
+  border: none;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.input-box button:hover {
+  background-color: #868585;
+}
+  </style>
+</head>
+<body>
+    <header>
+    <div class="logo"><img src="logo.jpg" alt="로고"></div>
+    <nav>
+        <ul>
+        <li><a href="main.html">| HOME |</a></li>
+        <li><a href="region.html">| 주요도시 |</a></li>
+        <li><a href="review.html">| 여행 후기 남기기 |</a></li>
+        <li><a href="#">| 설명 |</a></li>
+        </ul>
+    </nav>
+    </header>
+  <div id="wrapper">
+    <div id="left-box"></div>
+    <div id="right-box"></div>
+    <div id="content-box">
+      <h1>여행 후기 남기기</h1>
+<div class="input-box">
+  <select id="regionSelect">
+    <option disabled selected>지역 선택</option>
+    <option>서울</option>
+    <option>인천</option>
+    <option>대전</option>
+    <option>대구</option>
+    <option>광주</option>
+    <option>부산</option>
+    <option>울산</option>
+    <option>경기도</option>
+    <option>강원도</option>
+    <option>충청도</option>
+    <option>경상도</option>
+    <option>전라도</option>
+    <option>제주도</option>
+    <option>세종</option>
+  </select>
+
+  <textarea id="reviewInput" rows="6" placeholder="당신의 여행 후기를 적어주세요!"></textarea>
+  <button onclick="addReview()">등록</button>
+</div>
+
+      <div id="reviewContainer">
+        <!-- 작성된 후기들이 이곳에 추가됨 -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function addReview() {
+      const text = document.getElementById('reviewInput').value.trim();
+      const region = document.getElementById('regionSelect').value;
+      if (!text || region === "지역 선택") return;
+
+      const container = document.getElementById('reviewContainer');
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      const now = new Date();
+      const dateStr = now.toISOString().slice(0, 10);
+
+      card.innerHTML = `
+        <div>${text.replace(/\n/g, "<br>")}</div>
+        <div class="date-country">
+          <span>${dateStr}</span> | <span>여행지: ${region}</span>
+        </div>
+      `;
+
+      container.prepend(card);
+      document.getElementById('reviewInput').value = '';
+      document.getElementById('regionSelect').selectedIndex = 0;
+    }
+  </script>
+</body>
+</html>
