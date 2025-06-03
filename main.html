@@ -136,6 +136,75 @@
       object-fit: cover;
       margin-bottom: 10px;
     }
+#recommendation-section {
+  text-align: center;
+  margin: 80px auto 100px auto;
+  padding: 40px 20px;
+  background-color: #f1f1f1;
+  border-radius: 16px;
+  max-width: 800px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+#recommendation-section h2 {
+  font-size: 1.7rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+#recommendation-section button {
+  background-color: #868585;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-bottom: 30px;
+  transition: background-color 0.3s ease;
+}
+
+#recommendation-section button:hover {
+  background-color: #5e5e5e;
+}
+
+#recommendation-box {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.4s ease;
+}
+
+#recommendation-box img {
+  width: 320px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  transition: transform 0.3s;
+}
+
+#recommendation-box img:hover {
+  transform: scale(1.03);
+}
+
+#recommendation-box p {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+  margin-top: 10px;
+  text-decoration: underline;
+}
+
+#recommendation-box a {
+  text-decoration: none;
+}
+
   </style>
 </head>
 <body>
@@ -146,7 +215,6 @@
         <li><a href="main.html">| HOME |</a></li>
         <li><a href="region.html">| 주요도시 |</a></li>
         <li><a href="review.html">| 여행 후기 작성하기 |</a></li>
-        <li><a href="#">| 설명 |</a></li>
       </ul>
     </nav>
   </header>
@@ -196,6 +264,20 @@
   </div>
 </section>
 
+<hr>
+<section id="recommendation-section">
+  <h2>오늘의 여행지 추천</h2>
+  <button onclick="recommendPlace()">추천 받기</button>
+
+  <div id="recommendation-box" class="hidden">
+    <a id="placeLink" href="#">
+      <img id="placeImage" src="" alt="추천 여행지 이미지">
+      <p id="placeName">여행지 이름</p>
+    </a>
+  </div>
+</section>
+
+
   <script>
     let currentSlide = 0;
     const totalSlides = 4;
@@ -218,6 +300,36 @@
     }
 
     updateSlide();
+const travelPlaces = [
+  { name: "서울", image: "img/서울/서울.jpg", link: "seoul.html" },
+  { name: "부산", image: "img/부산/부산.jpg", link: "busan.html" },
+  { name: "제주도", image: "img/제주도/제주도.jpg", link: "jeju.html" },
+  { name: "대구", image: "img/대구/대구.jpg", link: "daegu.html" },
+  { name: "대전", image: "img/대전/대전.jpg", link: "daejeon.html" },
+  { name: "광주", image: "img/광주/광주.jpg", link: "gwangju.html" },
+  { name: "울산", image: "img/울산/울산.jpg", link: "ulsan.html" },
+  { name: "세종", image: "img/세종/세종.jpg", link: "sejong.html" },
+  { name: "경기도", image: "img/경기도/경기도.jpg", link: "gyeonggi.html" },
+  { name: "강원도", image: "img/강원도/강원도.jpg", link: "gangwon.html" },
+  { name: "충청도", image: "img/충청도/충청도.jpg", link: "chungcheong.html" },
+  { name: "경상도", image: "img/경상도/경상도.jpg", link: "gyeongsang.html" },
+  { name: "전라도", image: "img/전라도/전라도.jpg", link: "jeolla.html" },
+  { name: "인천", image: "img/인천/인천.jpg", link: "incheon.html" }
+];
+
+function recommendPlace() {
+  const random = Math.floor(Math.random() * travelPlaces.length);
+  const place = travelPlaces[random];
+
+  document.getElementById('placeImage').src = place.image;
+  document.getElementById('placeName').innerText = place.name;
+  document.getElementById('placeLink').href = place.link;
+
+  const box = document.getElementById('recommendation-box');
+  box.style.display = 'flex';
+}
+
+
   </script>
 </body>
 </html>
