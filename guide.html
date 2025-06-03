@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>이용 가이드</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #eaeaea;
+    }
+
+    header {
+      background-color: #ccc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .logo img {
+      height: 74px;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 24px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #222;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .guide-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 40px;
+      background-color: #fefefe;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .guide-section {
+      margin-bottom: 60px;
+    }
+
+    .guide-section h2 {
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+      color: #444;
+    }
+
+    .guide-section p {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: #333;
+    }
+
+    .guide-img {
+      width: 100%;
+      border-radius: 16px;
+      margin-top: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .faq-box {
+      background-color: #f1f1f1;
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 24px;
+    }
+
+    .faq-box h3 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+
+    .faq-box p {
+      font-size: 0.95rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo"><img src="logo.png" alt="로고" /></div>
+    <nav>
+      <ul>
+        <li><a href="main.html">| HOME |</a></li>
+        <li><a href="region.html">| 주요도시 |</a></li>
+        <li><a href="review.html">| 여행 후기 작성하기 |</a></li>
+        <li><a href="guide.html">| 이용 가이드 |</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="guide-container">
+    <section class="guide-section">
+      <h2>우리 사이트는 어떤 곳인가요?</h2>
+      <p>
+        전국 방방곡곡, 숨겨진 보석 같은 국내 여행지를 한눈에!
+        <br />우리 사이트는 서울부터 제주까지 각 지역의 <strong>관광지</strong>와 <strong>맛집</strong>,
+        그리고 <strong>현지인 추천 꿀팁</strong>까지 한 곳에서 소개해드립니다.
+      </p>
+      <img class="guide-img" src="img/guide/화면예시.png" alt="서비스 소개 예시 화면">
+    </section>
+
+    <section class="guide-section">
+      <h2>어떻게 사용하나요?</h2>
+      <p>
+        상단 메뉴에서 <strong>주요도시</strong>를 클릭하면 전국 14개 지역이 표시된 페이지로 이동합니다.
+        <br />각 지역을 누르면 상세 페이지로 연결되어, 여행지/맛집 정보와 함께 유튜브 영상까지 확인할 수 있어요.
+        <br /><br />
+        또한 <strong>"여행 후기 작성하기"</strong> 페이지에서는 직접 다녀온 후기를 등록하고,
+        다른 여행자들의 후기도 확인할 수 있습니다.
+      </p>
+      <img class="guide-img" src="img/guide/후기작성예시.png" alt="후기 작성 화면 예시">
+    </section>
+
+    <section class="guide-section">
+      <h2>자주 묻는 질문</h2>
+      <div class="faq-box">
+        <h3>Q. 여행지는 어떤 기준으로 선정되었나요?</h3>
+        <p>A. 지역별 인기 관광지 + 현지인의 추천을 반영하여 선정했습니다.</p>
+      </div>
+      <div class="faq-box">
+        <h3>Q. 후기 등록 시 개인정보는 저장되나요?</h3>
+        <p>A. 아니요. 후기는 익명으로 등록되며 어떤 개인 정보도 저장되지 않습니다.</p>
+      </div>
+      <div class="faq-box">
+        <h3>Q. 모바일에서도 이용할 수 있나요?</h3>
+        <p>A. 네! 반응형 디자인으로 스마트폰에서도 편리하게 사용할 수 있습니다.</p>
+      </div>
+      <img class="guide-img" src="img/guide/모바일뷰예시.png" alt="모바일 뷰 예시">
+    </section>
+  </main>
+</body>
+</html>
