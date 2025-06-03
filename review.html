@@ -21,12 +21,12 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 40px;
+    padding: 15px 40px;
     border-bottom: 1px solid #ccc;
 }
 
 .logo img {
-  height: 40px;
+  height: 74px;
 }
 
 nav ul {
@@ -47,7 +47,7 @@ nav a {
       width: 100%;
       height: 100vh;
       background-color: #ccc;
-      padding: 8px 80px;
+      padding: 8px 150px;
     }
 
 
@@ -79,6 +79,7 @@ nav a {
     h1 {
       font-size: 1.8rem;
       margin-bottom: 20px;
+      text-align: center; 
     }
 
     select, textarea {
@@ -107,13 +108,44 @@ nav a {
       margin-top: 20px;
     }
 
-    .card {
-      background-color: #f1f1f1;
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
+.card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin: 24px auto;
+  max-width: 700px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.card .date {
+  text-align: right;
+  font-size: 0.85rem;
+  color: #999;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 6px;
+  margin-bottom: 16px;
+}
+
+.card .text {
+  color: #333;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.card .region {
+  text-align: right;
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+}
+
+
 
     .date-country {
       font-size: 0.85rem;
@@ -122,11 +154,11 @@ nav a {
       text-align: right;
     }
     .input-box {
-  background-color: #f9f9f9;
-  padding: 24px;
+  background-color: #f1f1f1;
+  padding: 40px;
   border-radius: 16px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  max-width: 600px;
+  max-width: 1000px;
   margin: 0 auto 40px auto;
 }
 
@@ -164,12 +196,12 @@ nav a {
 </head>
 <body>
     <header>
-    <div class="logo"><img src="logo.jpg" alt="로고"></div>
+    <div class="logo"><img src="logo.png" alt="로고"></div>
     <nav>
         <ul>
         <li><a href="main.html">| HOME |</a></li>
         <li><a href="region.html">| 주요도시 |</a></li>
-        <li><a href="review.html">| 여행 후기 남기기 |</a></li>
+        <li><a href="review.html">| 여행 후기 작성하기 |</a></li>
         <li><a href="#">| 설명 |</a></li>
         </ul>
     </nav>
@@ -178,7 +210,7 @@ nav a {
     <div id="left-box"></div>
     <div id="right-box"></div>
     <div id="content-box">
-      <h1>여행 후기 남기기</h1>
+      <h1>여행 후기 작성하기</h1>
 <div class="input-box">
   <select id="regionSelect">
     <option disabled selected>지역 선택</option>
@@ -221,12 +253,12 @@ nav a {
       const now = new Date();
       const dateStr = now.toISOString().slice(0, 10);
 
-      card.innerHTML = `
-        <div>${text.replace(/\n/g, "<br>")}</div>
-        <div class="date-country">
-          <span>${dateStr}</span> | <span>여행지: ${region}</span>
-        </div>
-      `;
+ card.innerHTML = `
+  <div class="date">${dateStr}</div>
+  <div class="text">${text.replace(/\n/g, "<br>")}</div>
+  <div class="region">${region}</div>
+`;
+
 
       container.prepend(card);
       document.getElementById('reviewInput').value = '';
