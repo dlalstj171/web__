@@ -341,81 +341,26 @@ nav a {
   </select>
 
   <textarea id="reviewInput" rows="6" placeholder="당신의 여행 후기를 적어주세요!"></textarea>
-  <button onclick="addReview()">등록</button>
+  <button onclick="clearReview()">등록</button>
 </div>
 
-      <div id="reviewContainer">
-        <!-- 작성된 후기들이 이곳에 추가됨 -->
-      </div>
+
+      
     </div>
   </div>
 
-  <script>
-    function addReview() {
-  const text = document.getElementById('reviewInput').value.trim();
-  const region = document.getElementById('regionSelect').value;
-  if (!text || region === "지역 선택") return;
+<script>
+  function clearReview() {
+    const text = document.getElementById('reviewInput').value.trim();
+    const region = document.getElementById('regionSelect').value;
 
-  const container = document.getElementById('reviewContainer');
+    if (!text || region === "지역 선택") return;
 
-  // 🔧 정확히 id로 탐지해서 제거
-  const placeholder = document.getElementById('noReviewMessage');
-  if (placeholder && placeholder.parentNode === container) {
-    container.removeChild(placeholder);
+    alert('후기가 등록되었습니다!)');
+    document.getElementById('reviewInput').value = '';
+    document.getElementById('regionSelect').selectedIndex = 0;
   }
+</script>
 
-  const card = document.createElement('div');
-  card.className = 'card';
-
-  const now = new Date();
-  const dateStr = now.toISOString().slice(0, 10);
-
-  card.innerHTML = `
-    <div class="date">${dateStr}</div>
-    <div class="text">${text.replace(/\n/g, "<br>")}</div>
-    <div class="region">${region}</div>
-  `;
-
-  container.prepend(card);
-
-  document.getElementById('reviewInput').value = '';
-  document.getElementById('regionSelect').selectedIndex = 0;
-}
-
-    window.onload = function () {
-  const container = document.getElementById('reviewContainer');
-  if (container.children.length === 0) {
-    const msg = document.createElement('p');
-    msg.id = 'noReviewMessage';
-    msg.textContent = '아직 등록된 후기가 없습니다. 첫 후기를 작성해보세요!';
-    msg.style.textAlign = 'center';
-    msg.style.color = '#999';
-    msg.style.padding = '40px';
-    msg.style.fontSize = '1rem';
-    container.appendChild(msg);
-  }
-};
- let currentSlide = 0;
-    const totalSlides = 4;
-    const track = document.getElementById('carousel-track');
-    const indicator = document.getElementById('slide-indicator');
-
-    function updateSlide() {
-      track.style.transform = `translateX(-${currentSlide * 100}%)`;
-      indicator.textContent = `${String(currentSlide + 1).padStart(2, '0')} / 04`;
-    }
-
-    function nextSlide() {
-      currentSlide = (currentSlide + 1) % totalSlides;
-      updateSlide();
-    }
-
-    function prevSlide() {
-      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-      updateSlide();
-    }
-
-    updateSlide();
-  </script>
 </body>
 </html>
