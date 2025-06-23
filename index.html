@@ -13,16 +13,49 @@
     body {
       background-color: #f0f0f3;
       color: #333;
-      padding: 60px 20px;
+      padding: 0;
     }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0px 40px;
+      background-color: #f0f0f3;
+      border-bottom: solid 1px #f0f0f3;
+      height: 100px;
+    }
+
+    .logo img {
+      height: 80px;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 24px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #222;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
     .container {
       max-width: 900px;
-      margin: auto;
+      margin: 60px auto;
       background: white;
       border-radius: 24px;
       box-shadow: 0 12px 24px rgba(0,0,0,0.1);
       padding: 40px;
     }
+
     h1 {
       font-size: 2.8rem;
       margin-bottom: 10px;
@@ -64,6 +97,21 @@
   </style>
 </head>
 <body>
+
+  <header>
+    <div class="logo"><img src="logo.png" alt="로고"></div>
+    <nav>
+      <ul>
+        <li><a href="main.html">| HOME |</a></li>
+        <li><a href="region.html">| 주요도시 |</a></li>
+        <li><a href="review.html">| 여행 후기 작성하기 |</a></li>
+        <li><a href="guide.html">| 이용가이드 |</a></li>
+        <li><a href="index.html">| 포트폴리오 |</a></li>
+
+      </ul>
+    </nav>
+  </header>
+
   <div class="container">
     <h1>이민서</h1>
     <div class="subtitle">23살 · 컴퓨터공학과</div>
@@ -80,18 +128,20 @@
     </div>
 
     <div class="section">
-      <h2>진행한/진행중인 <a href="main.html">프로젝트</a></h2>
-     <a href="https://github.com/dlalstj171" target="_blank" style="display:inline-block; margin-top:10px; color:black; font-weight:bold;text-decoration: none;">
+      <h2>진행한/진행중인 프로젝트</h2>
+      <a href="https://github.com/dlalstj171" target="_blank" style="display:inline-block; margin-top:10px; color:black; font-weight:bold;text-decoration: none;">
         → 깃허브 바로 가기
       </a>      
       <div class="card">
         <h3>🎮 3D FPS 게임 개발 (Unity)</h3>
         <p>Unity를 사용하여 1인칭 슈팅 게임을 설계하고 구현하고있습니다. 총기 시스템, 탄피 이펙트, 체력 UI 등 주요 기능을 모두 스크립트로 작성했으며, 사용자 중심의 조작과 반응형 UI에 중점을 두었습니다.</p>
+        <br>
+        <p>자기평가: ★★★★☆</p>
       </div>
       <div class="card">
         <h3>📚 도서관 대여/관리 시스템 (Database 기반)</h3>
         <p>MySQL과 연동되는 웹 기반 도서관리 시스템을 개발하였으며, 도서 검색/대여/반납 기능과 관리자 페이지를 포함한 구조로 구성했습니다.</p>
-                <br>
+        <br>
         <p>자기평가: ★★★☆☆</p>
       </div>
       <div class="card">
@@ -111,7 +161,7 @@
     </div>
 
     <footer>
-      
+      ⓒ 2025 이민서. All rights reserved.
     </footer>
   </div>
 </body>
