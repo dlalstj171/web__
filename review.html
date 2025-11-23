@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,35 +13,34 @@
     }
 
     body, html {
-      width: 100%;
-      height: 100%;
       font-family: 'Noto Sans KR', sans-serif;
     }
-header {
-    background-color: #ccc;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 40px;
-    border-bottom: 1px solid #ccc;
-}
+    header {
+      background-color: #cecbcb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0px 40px;
+      border-bottom: 1px solid #ccc;
+    }
 
-.logo img {
-  height: 74px;
-}
+    .logo img {
+      height: 74px;
+    }
 
-nav ul {
-  list-style: none;
-  display: flex;
-  gap: 24px;
-}
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 24px;
+      margin: 0;
+    }
 
-nav a {
-  text-decoration: none;
-  color: #222;
-  font-size: 0.95rem;
-  font-weight: 500;
-}
+    nav a {
+      text-decoration: none;
+      color: #222;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
 
     #wrapper {
       position: relative;
@@ -51,7 +51,8 @@ nav a {
     }
 
 
-    #left-box, #right-box {
+    #left-box,
+    #right-box {
       position: absolute;
       top: 0;
       width: 80px;
@@ -67,22 +68,23 @@ nav a {
       right: 0;
     }
 
-#content-box {
-  width: 100%;
-  height: 85%; 
-  background-color: #fefefe;
-  border-radius: 8px;
-  padding: 40px;
-  overflow-y: auto;
-}
+    #content-box {
+      width: 100%;
+      height: 85%;
+      background-color: #fefefe;
+      border-radius: 8px;
+      padding: 40px;
+      overflow-y: auto;
+    }
 
     h1 {
       font-size: 1.8rem;
       margin-bottom: 20px;
-      text-align: center; 
+      text-align: center;
     }
 
-    select, textarea {
+    select,
+    textarea {
       display: block;
       width: 100%;
       margin-bottom: 20px;
@@ -108,42 +110,42 @@ nav a {
       margin-top: 20px;
     }
 
-.card {
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 20px 24px;
-  margin: 24px auto;
-  max-width: 700px;
-  border: 1px solid #ddd;
-  font-size: 1rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
+    .card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin: 24px auto;
+      max-width: 700px;
+      border: 1px solid #ddd;
+      font-size: 1rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
 
-.card .date {
-  text-align: right;
-  font-size: 0.85rem;
-  color: #999;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 6px;
-  margin-bottom: 16px;
-}
+    .card .date {
+      text-align: right;
+      font-size: 0.85rem;
+      color: #999;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 6px;
+      margin-bottom: 16px;
+    }
 
-.card .text {
-  color: #333;
-  line-height: 1.6;
-  white-space: pre-wrap;
-}
+    .card .text {
+      color: #333;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
 
-.card .region {
-  text-align: right;
-  font-size: 0.9rem;
-  color: #555;
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 6px;
-}
+    .card .region {
+      text-align: right;
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 6px;
+    }
 
 
 
@@ -153,72 +155,75 @@ nav a {
       margin-top: 10px;
       text-align: right;
     }
+
     .input-box {
-  background-color: #f1f1f1;
-  padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  max-width: 1000px;
-  margin: 0 auto 40px auto;
-}
+      background-color: #f1f1f1;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      max-width: 1000px;
+      margin: 0 auto 40px auto;
+    }
 
-.input-box select,
-.input-box textarea {
-  width: 100%;
-  padding: 10px 14px;
-  font-size: 0.95rem;
-  border-radius: 12px;
-  border: 1px solid #ccc;
-  margin-bottom: 16px;
-  background-color: white;
-}
+    .input-box select,
+    .input-box textarea {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      margin-bottom: 16px;
+      background-color: white;
+    }
 
-.input-box textarea {
-  resize: vertical;
-}
+    .input-box textarea {
+      resize: vertical;
+    }
 
-.input-box button {
-  width: 100%;
-  padding: 10px;
-  border-radius: 12px;
-  background-color: #868585;
-  border: none;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
+    .input-box button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 12px;
+      background-color: #868585;
+      border: none;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
 
-.input-box button:hover {
-  background-color: #868585;
-}
-.review-banner {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 40px;
-}
+    .input-box button:hover {
+      background-color: #868585;
+    }
 
-.review-banner img {
-  height: 160px;
-  border-radius: 12px;
-  object-fit: cover;
-}
+    .review-banner {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
 
-.gallery {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 60px;
-}
+    .review-banner img {
+      height: 160px;
+      border-radius: 12px;
+      object-fit: cover;
+    }
 
-.gallery img {
-  width: 140px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 10px;
-}
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 60px;
+    }
+
+    .gallery img {
+      width: 140px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
     .carousel {
       display: flex;
       overflow: hidden;
@@ -228,6 +233,7 @@ nav a {
       aspect-ratio: 16 / 9;
       border-radius: 12px;
     }
+
     .carousel-slide {
       flex: 0 0 100%;
       position: relative;
@@ -246,7 +252,7 @@ nav a {
       left: 0;
       right: 0;
       padding: 20px;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
       color: #fff;
       font-size: 1rem;
       opacity: 0;
@@ -264,43 +270,42 @@ nav a {
       width: 300%;
     }
 
-.carousel-indicator {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  margin: 24px auto;
-  height: 44px; 
-}
+    .carousel-indicator {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin: 24px auto;
+      height: 44px;
+    }
 
-.carousel-indicator button {
-  all: unset; 
-  width: 44px;
-  height: 44px;
-  border-radius: 8px;
-  background-color: #eee;
-  text-align: center;
-  font-size: 1.2rem;
-  line-height: 44px;
-  cursor: pointer;
-  user-select: none;
-}
+    .carousel-indicator button {
+      all: unset;
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background-color: #eee;
+      text-align: center;
+      font-size: 1.2rem;
+      line-height: 44px;
+      cursor: pointer;
+      user-select: none;
+    }
 
-.carousel-indicator button:hover {
-  background-color: #ddd;
-}
+    .carousel-indicator button:hover {
+      background-color: #ddd;
+    }
 
-#slide-indicator {
-  font-size: 1rem;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
+    #slide-indicator {
+      font-size: 1rem;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   </style>
 </head>
+
 <body>
   <header>
     <div class="logo"><img src="logo.png" alt="로고"></div>
@@ -323,46 +328,47 @@ nav a {
       <h1>여행 후기</h1>
 
 
-<div class="input-box">
-  <select id="regionSelect">
-    <option disabled selected>지역 선택</option>
-    <option>서울</option>
-    <option>인천</option>
-    <option>대전</option>
-    <option>대구</option>
-    <option>광주</option>
-    <option>부산</option>
-    <option>울산</option>
-    <option>경기도</option>
-    <option>강원도</option>
-    <option>충청도</option>
-    <option>경상도</option>
-    <option>전라도</option>
-    <option>제주도</option>
-    <option>세종</option>
-  </select>
+      <div class="input-box">
+        <select id="regionSelect">
+          <option disabled selected>지역 선택</option>
+          <option>서울</option>
+          <option>인천</option>
+          <option>대전</option>
+          <option>대구</option>
+          <option>광주</option>
+          <option>부산</option>
+          <option>울산</option>
+          <option>경기도</option>
+          <option>강원도</option>
+          <option>충청도</option>
+          <option>경상도</option>
+          <option>전라도</option>
+          <option>제주도</option>
+          <option>세종</option>
+        </select>
 
-  <textarea id="reviewInput" rows="6" placeholder="당신의 여행 후기를 적어주세요!"></textarea>
-  <button onclick="clearReview()">등록</button>
-</div>
+        <textarea id="reviewInput" rows="6" placeholder="당신의 여행 후기를 적어주세요!"></textarea>
+        <button onclick="clearReview()">등록</button>
+      </div>
 
 
-      
+
     </div>
   </div>
 
-<script>
-  function clearReview() {
-    const text = document.getElementById('reviewInput').value.trim();
-    const region = document.getElementById('regionSelect').value;
+  <script>
+    function clearReview() {
+      const text = document.getElementById('reviewInput').value.trim();
+      const region = document.getElementById('regionSelect').value;
 
-    if (!text || region === "지역 선택") return;
+      if (!text || region === "지역 선택") return;
 
-    alert('후기가 등록되었습니다!)');
-    document.getElementById('reviewInput').value = '';
-    document.getElementById('regionSelect').selectedIndex = 0;
-  }
-</script>
+      alert('후기가 등록되었습니다!)');
+      document.getElementById('reviewInput').value = '';
+      document.getElementById('regionSelect').selectedIndex = 0;
+    }
+  </script>
 
 </body>
+
 </html>
