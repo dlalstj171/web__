@@ -1,0 +1,218 @@
+/* main.css */
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #fff;
+  color: #222;
+}
+
+/* Header */
+header {
+  background-color: #cecbcb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 40px;
+  border-bottom: solid #eee;
+}
+
+.logo img {
+  height: 74px;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 24px;
+  margin: 0;
+}
+
+nav a {
+  text-decoration: none;
+  color: #222;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Carousel */
+.carousel {
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  margin: 40px auto;
+  max-width: 1000px;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+}
+
+.carousel-slide {
+  flex: 0 0 100%;
+  position: relative;
+}
+
+.carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 0 0 12px 12px;
+}
+
+.carousel-slide:hover .overlay {
+  opacity: 1;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  width: 300%;
+}
+
+.carousel-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin: 20px auto;
+}
+
+.carousel-indicator button {
+  border: none;
+  background: #eee;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Top Destinations */
+.top-destinations {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.top-destinations h2 {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.top-destinations p {
+  font-size: 0.95rem;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.destination-grid {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.destination-grid a {
+  text-align: center;
+  color: inherit;
+  text-decoration: none;
+}
+
+.destination {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.destination img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+/* Recommendation Section */
+#recommendation-section {
+  text-align: center;
+  margin: 80px auto 100px auto;
+  padding: 40px 20px;
+  background-color: #f1f1f1;
+  border-radius: 16px;
+  max-width: 800px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+#recommendation-section h2 {
+  font-size: 1.7rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+#recommendation-section button {
+  background-color: #868585;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-bottom: 30px;
+  transition: background-color 0.3s ease;
+}
+
+#recommendation-section button:hover {
+  background-color: #5e5e5e;
+}
+
+#recommendation-box {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.4s ease;
+}
+
+#recommendation-box img {
+  width: 320px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  transition: transform 0.3s;
+}
+
+#recommendation-box img:hover {
+  transform: scale(1.03);
+}
+
+#recommendation-box p {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+  margin-top: 10px;
+}
+
+#recommendation-box a {
+  text-decoration: none;
+}
