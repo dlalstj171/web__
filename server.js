@@ -81,15 +81,15 @@ app.post('/api/reviews', async (req, res) => {
     `;
     const [result] = await pool.execute(sql, [region, numRating, content]);
 
-    console.log('✅ 리뷰 저장 성공, insertId =', result.insertId);
+    console.log('리뷰 저장 성공, insertId =', result.insertId);
 
     res.status(201).json({
       message: '리뷰가 저장되었습니다.',
       reviewId: result.insertId
     });
   } catch (err) {
-    console.error('❌ POST /api/reviews 에러 코드:', err.code);
-    console.error('❌ POST /api/reviews 에러 메시지:', err.message);
+    console.error('POST /api/reviews 에러 코드:', err.code);
+    console.error('POST /api/reviews 에러 메시지:', err.message);
     res.status(500).json({ message: '서버 오류가 발생했습니다.' });
   }
 });
@@ -113,8 +113,8 @@ app.get('/api/reviews', async (req, res) => {
     console.log(`📤 GET /api/reviews (${region || '전체'}) -> ${rows.length}개`);
     res.json(rows);
   } catch (err) {
-    console.error('❌ GET /api/reviews 에러 코드:', err.code);
-    console.error('❌ GET /api/reviews 에러 메시지:', err.message);
+    console.error('GET /api/reviews 에러 코드:', err.code);
+    console.error('GET /api/reviews 에러 메시지:', err.message);
     res.status(500).json({ message: '서버 오류가 발생했습니다.' });
   }
 });
@@ -123,5 +123,5 @@ app.get('/api/reviews', async (req, res) => {
 // 6) 서버 시작
 // ===============================
 app.listen(PORT, () => {
-  console.log(`🚀 서버 실행됨 → http://localhost:${PORT}`);
+  console.log(`서버 실행됨 → http://localhost:${PORT}`);
 });
