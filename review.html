@@ -64,82 +64,112 @@
   </main>
 
   <script>
-    const API_BASE = "http://localhost:3000";
+  const API_BASE = "http://localhost:3000";
 
-    document.addEventListener("DOMContentLoaded", () => {
-      console.log("✅ review.html 스크립트 로드됨");
+  document.addEventListener("DOMContentLoaded", () => {
+    console.log("✅ review.html 스크립트 로드됨");
 
-      let selectedStar = 0;
-      const starBox   = document.querySelector(".star-box");
-      const starElems = document.querySelectorAll(".star");
-      const submitBtn = document.getElementById("submitReview");
+    let selectedStar = 0;
+    const starBox   = document.querySelector(".star-box");
+    const starElems = document.querySelectorAll(".star");
+    const submitBtn = document.getElementById("submitReview");
 
-      function paintStars(rating) {
-        starElems.forEach(star => {
-          const value = Number(star.dataset.value); // 1~5
-          star.classList.toggle("active", value <= rating);
-        });
-      }
-
-      // 마우스 올리면 해당 별까지 노란색 (미리보기)
+    function paintStars(rating) {
       starElems.forEach(star => {
-        star.addEventListener("mouseenter", () => {
-          const hoverValue = Number(star.dataset.value);
-          paintStars(hoverValue);
-        });
+        const value = Number(star.dataset.value); // 1~5
+        star.classList.toggle("active", value <= rating);
+      });
+    }
 
-        // 클릭하면 그 값으로 확정 + 다시 칠하기
-        star.addEventListener("click", () => {
-          selectedStar = Number(star.dataset.value);
-          paintStars(selectedStar);
-          console.log("⭐ 선택한 별점:", selectedStar);
-        });
+    // 마우스 올리면 해당 별까지 노란색 (미리보기)
+    starElems.forEach(star => {
+      star.addEventListener("mouseenter", () => {
+        const hoverValue = Number(star.dataset.value);
+        paintStars(hoverValue);
       });
 
-      // 별 영역에서 마우스 빠져나가면, 선택값 기준으로 복원
-      if (starBox) {
-        starBox.addEventListener("mouseleave", () => {
-          paintStars(selectedStar);
-        });
+      // 클릭하면 그 값으로 확정 + 다시 칠하기
+      star.addEventListener("click", () => {
+        selectedStar = Number(star.dataset.value);
+        paintStars(selectedStar);
+        console.log("⭐ 선택한 별점:", selectedStar);
+      });
+    });
+
+    // 별 영역에서 마우스 빠져나가면, 선택값 기준으로 복원
+    if (starBox) {
+      starBox.addEventListener("mouseleave", () => {
+        paintStars(selectedStar);
+      });
+    }
+
+// ============================
+// 🔹 후기 글자 수 카운터
+// ============================
+const textarea    = document.getElementById("reviewInput");
+const charCountEl = document.getElementById("charCount");
+const MAX_LEN     = 300;   // maxlength랑 맞춰줌
+
+if (textarea && charCountEl) {
+  const updateCount = () => {
+    // 줄바꿈(\r\n)을 포함한 실제 문자열
+    let text = textarea.value;
+
+    // 300자를 넘으면 강제로 잘라서 300자로 맞춤
+    if (text.length > MAX_LEN) {
+      text = text.slice(0, MAX_LEN);
+      textarea.value = text;
+    }
+
+    // 화면에는 최대 300까지만 표시
+    charCountEl.textContent = text.length;
+  };
+
+  // 타이핑할 때마다 숫자 업데이트
+  textarea.addEventListener("input", updateCount);
+  // 페이지 처음 열릴 때도 한 번 호출
+  updateCount();
+}
+
+
+    // 작성 완료 버튼 → 서버로 POST
+    submitBtn.addEventListener("click", async () => {
+      const region = document.getElementById("regionSelect").value;
+      const text   = document.getElementById("reviewInput").value.trim();
+
+      if (!text || region === "지역 선택" || !selectedStar) {
+        alert("지역 / 별점 / 내용을 모두 입력하세요!");
+        return;
       }
 
-      // 작성 완료 버튼 → 서버로 POST
-      submitBtn.addEventListener("click", async () => {
-        const region = document.getElementById("regionSelect").value;
-        const text   = document.getElementById("reviewInput").value.trim();
+      try {
+        const res = await fetch(`${API_BASE}/api/reviews`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            region: region,
+            rating: selectedStar,
+            content: text
+          })
+        });
 
-        if (!text || region === "지역 선택" || !selectedStar) {
-          alert("지역 / 별점 / 내용을 모두 입력하세요!");
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          console.error("❌ 리뷰 저장 실패:", errData);
+          alert(errData.message || "리뷰 저장 중 오류가 발생했습니다.");
           return;
         }
 
-        try {
-          const res = await fetch(`${API_BASE}/api/reviews`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              region: region,
-              rating: selectedStar,
-              content: text
-            })
-          });
-
-          if (!res.ok) {
-            const errData = await res.json().catch(() => ({}));
-            console.error("❌ 리뷰 저장 실패:", errData);
-            alert(errData.message || "리뷰 저장 중 오류가 발생했습니다.");
-            return;
-          }
-
-          alert("후기가 등록되었습니다!");
-          // 작성 후 목록 페이지로 이동
-          location.href = "review_list.html";
-        } catch (err) {
-          console.error("❌ 서버 요청 실패:", err);
-          alert("서버에 연결할 수 없습니다. (server.js가 켜져 있는지 확인해주세요)");
-        }
-      });
+        alert("후기가 등록되었습니다!");
+        // 작성 후 목록 페이지로 이동
+        location.href = "review_list.html";
+      } catch (err) {
+        console.error("❌ 서버 요청 실패:", err);
+        alert("서버에 연결할 수 없습니다. (server.js가 켜져 있는지 확인해주세요)");
+      }
     });
-  </script>
+  });
+</script>
+
 </body>
 </html>

@@ -54,13 +54,13 @@
   </main>
 
   <script>
-    const API_BASE = "http://localhost:3000";
+  const API_BASE = "http://localhost:3000";
 
-    document.addEventListener("DOMContentLoaded", () => {
-      console.log("✅ review_list.html 스크립트 로드됨");
+  document.addEventListener("DOMContentLoaded", () => {
+    console.log("✅ review_list.html 스크립트 로드됨");
 
-      const listEl = document.getElementById("reviewList");
-      const filterSelect = document.getElementById("filterRegion");
+    const listEl = document.getElementById("reviewList");
+    const filterSelect = document.getElementById("filterRegion");
 
       async function loadAndRenderReviews() {
         listEl.innerHTML = "<p>후기를 불러오는 중입니다...</p>";

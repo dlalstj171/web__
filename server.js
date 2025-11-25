@@ -1,37 +1,66 @@
-// js/server.js
+// js/server.js 가 아니라, 프로젝트 루트에 server.js 있다고 가정
+// (지금처럼 main.html, js/, css/, img/랑 같은 위치)
+
+// ===============================
+// 기본 설정
+// ===============================
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2/promise');
+const path = require('path');
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Live Server(5500)에서 오는 요청 허용
+// ===============================
+// 1) 정적 파일 서빙 (HTML / CSS / JS / 이미지)
+// ===============================
+// __dirname = server.js가 있는 폴더 (지금 프로젝트 루트)
+const publicRoot = __dirname;
+
+// /main.html, /seoul.html, /css/main.css, /js/review.js 같은 파일을
+// http://localhost:3000/ 아래에서 바로 열 수 있게 함
+app.use(express.static(publicRoot));
+
+// ===============================
+// 2) CORS & JSON 파서
+// ===============================
 app.use(cors({
-  origin: ['http://localhost:5500', 'http://127.0.0.1:5500']
+  origin: [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:5500',
+    'http://127.0.0.1:5500'
+  ]
 }));
 app.use(express.json());
 
 // ===============================
-// MySQL 연결 풀 (DB: travel_site)
+// 3) MySQL 연결 풀 (DB: travel_site)
 // ===============================
 const pool = mysql.createPool({
   host: 'localhost',
-  port: 3307,                // ⭐ MySQL 설치할 때 선택한 포트
-  user: 'root',              // root 계정
-  password: '1234',  // 설치할 때 정한 비밀번호
+  port: 3307,                // 네가 쓰고 있는 포트
+  user: 'root',              // 계정
+  password: '1234',          // 비밀번호
   database: 'travel_site',
   waitForConnections: true,
   connectionLimit: 10
 });
 
-// 테스트용 루트 엔드포인트
+// ===============================
+// 4) 기본 페이지: / 로 들어오면 main.html 보내기
+// ===============================
 app.get('/', (req, res) => {
-  res.send('Review API 서버 동작 중입니다.');
+  res.sendFile(path.join(publicRoot, 'main.html'));
 });
 
-// ------------------------------------
+// ===============================
+// 5) REST API - 리뷰 저장/조회
+//     주소는 전부 /api/... 으로 고정
+// ===============================
+
 // POST /api/reviews : 리뷰 저장
-// ------------------------------------
 app.post('/api/reviews', async (req, res) => {
   try {
     const { region, rating, content } = req.body;
@@ -41,7 +70,9 @@ app.post('/api/reviews', async (req, res) => {
 
     if (!region || !content || !Number.isInteger(numRating) ||
         numRating < 1 || numRating > 5) {
-      return res.status(400).json({ message: '지역, 내용, 별점(1~5)을 올바르게 입력해주세요.' });
+      return res
+        .status(400)
+        .json({ message: '지역, 내용, 별점(1~5)을 올바르게 입력해주세요.' });
     }
 
     const sql = `
@@ -63,9 +94,7 @@ app.post('/api/reviews', async (req, res) => {
   }
 });
 
-// ------------------------------------
 // GET /api/reviews : 리뷰 목록 조회 (최신순)
-// ------------------------------------
 app.get('/api/reviews', async (req, res) => {
   try {
     const { region } = req.query;
@@ -90,7 +119,9 @@ app.get('/api/reviews', async (req, res) => {
   }
 });
 
-const PORT = 3000;
+// ===============================
+// 6) 서버 시작
+// ===============================
 app.listen(PORT, () => {
-  console.log(`🚀 Review API 서버가 http://localhost:${PORT} 에서 실행 중`);
+  console.log(`🚀 서버 실행됨 → http://localhost:${PORT}`);
 });
