@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>여행 후기</title>
+
+  <!-- 공통 헤더/레이아웃 -->
+  <link rel="stylesheet" href="css/main.css">
+  <!-- 이 페이지 전용 스타일 -->
+  <link rel="stylesheet" href="css/review_list.css">
+</head>
+
+<body>
+  <header>
+    <div class="logo"><img src="logo.png" alt="로고"></div>
+    <nav>
+      <ul>
+        <li><a href="main.html">| HOME |</a></li>
+        <li><a href="region.html">| 주요도시 |</a></li>
+        <li><a href="review_list.html">| 여행 후기 |</a></li>
+        <li><a href="guide.html">| 이용가이드 |</a></li>
+        <li><a href="index.html">| 포트폴리오 |</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="review-list-page">
+    <section class="review-list-card">
+      <div class="review-list-header">
+        <h1>REAL REVIEW</h1>
+        <p>여행자들의 생생한 후기를 만나보세요.</p>
+      </div>
+
+      <!-- 지역 필터 -->
+      <div class="filter-bar">
+        <label for="filterRegion">지역별 보기</label>
+        <select id="filterRegion">
+          <option value="">전체 지역</option>
+          <option value="서울">서울</option><option value="인천">인천</option><option value="대전">대전</option>
+          <option value="대구">대구</option><option value="광주">광주</option><option value="부산">부산</option>
+          <option value="울산">울산</option><option value="경기도">경기도</option><option value="강원도">강원도</option>
+          <option value="충청도">충청도</option><option value="경상도">경상도</option><option value="전라도">전라도</option>
+          <option value="제주도">제주도</option><option value="세종">세종</option>
+        </select>
+      </div>
+
+      <a href="review.html" class="write-btn">후기 작성하기</a>
+
+      <div id="reviewList" class="review-list">
+        <!-- 후기 카드들이 JS로 여기 추가됨 -->
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const API_BASE = "http://localhost:3000";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("✅ review_list.html 스크립트 로드됨");
+
+      const listEl = document.getElementById("reviewList");
+      const filterSelect = document.getElementById("filterRegion");
+
+      async function loadAndRenderReviews() {
+        listEl.innerHTML = "<p>후기를 불러오는 중입니다...</p>";
+
+        try {
+          const url = new URL(`${API_BASE}/api/reviews`);
+          if (filterSelect && filterSelect.value) {
+            url.searchParams.set("region", filterSelect.value);
+          }
+
+          const res = await fetch(url);
+          const reviews = await res.json();
+
+          if (!Array.isArray(reviews) || reviews.length === 0) {
+            listEl.innerHTML = "<p>등록된 후기가 없습니다.</p>";
+            return;
+          }
+
+          listEl.innerHTML = "";
+
+          reviews.forEach(r => {
+            const rawRating = Number(r.rating) || 0;
+            const starCount = Math.min(Math.max(rawRating, 0), 5); // 0~5로 제한
+            const dateStr = r.created_at
+              ? new Date(r.created_at).toLocaleString("ko-KR")
+              : "";
+
+            listEl.innerHTML += `
+              <div class="review-card">
+                <div class="stars">
+                  ${"★".repeat(starCount)}${"☆".repeat(5 - starCount)}
+                </div>
+                <div class="review-top">
+                  <div class="review-region">${r.region}</div>
+                  <div class="review-date">${dateStr}</div>
+                </div>
+                <div class="review-content">${r.content}</div>
+              </div>
+            `;
+          });
+        } catch (err) {
+          console.error("❌ 리뷰 목록 불러오기 실패:", err);
+          listEl.innerHTML = "<p>리뷰를 불러오는 중 오류가 발생했습니다.</p>";
+        }
+      }
+
+      // 페이지 로드시 자동 로딩
+      loadAndRenderReviews();
+
+      // 필터 변경 시 다시 로딩
+      if (filterSelect) {
+        filterSelect.addEventListener("change", loadAndRenderReviews);
+      }
+    });
+  </script>
+</body>
+</html>

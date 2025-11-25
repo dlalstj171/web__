@@ -4,9 +4,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>여행 후기</title>
-  <link rel="stylesheet" href="css/review.css">
+  <title>여행 후기 작성</title>
 
+  <!-- 헤더/메뉴 스타일 공통 사용 -->
+  <link rel="stylesheet" href="css/main.css">
+  <!-- 이 페이지 전용 스타일 -->
+  <link rel="stylesheet" href="css/review.css">
 </head>
 
 <body>
@@ -16,62 +19,127 @@
       <ul>
         <li><a href="main.html">| HOME |</a></li>
         <li><a href="region.html">| 주요도시 |</a></li>
-        <li><a href="review.html">| 여행 후기 작성하기 |</a></li>
+        <li><a href="review_list.html">| 여행 후기 |</a></li>
         <li><a href="guide.html">| 이용가이드 |</a></li>
         <li><a href="index.html">| 포트폴리오 |</a></li>
-
       </ul>
     </nav>
   </header>
 
-  <div id="wrapper">
-    <div id="left-box"></div>
-    <div id="right-box"></div>
-    <div id="content-box">
-      <h1>여행 후기</h1>
+  <main class="review-write-page">
+    <section class="review-form-card">
+      <h1 class="review-title">여행 후기 작성</h1>
+      <p class="review-subtitle">다녀온 여행지에 대한 솔직한 후기를 남겨주세요.</p>
 
+      <label class="field-label" for="regionSelect">여행 지역</label>
+      <select id="regionSelect">
+        <option disabled selected>지역 선택</option>
+        <option>서울</option><option>인천</option><option>대전</option>
+        <option>대구</option><option>광주</option><option>부산</option>
+        <option>울산</option><option>경기도</option><option>강원도</option>
+        <option>충청도</option><option>경상도</option><option>전라도</option>
+        <option>제주도</option><option>세종</option>
+      </select>
 
-      <div class="input-box">
-        <select id="regionSelect">
-          <option disabled selected>지역 선택</option>
-          <option>서울</option>
-          <option>인천</option>
-          <option>대전</option>
-          <option>대구</option>
-          <option>광주</option>
-          <option>부산</option>
-          <option>울산</option>
-          <option>경기도</option>
-          <option>강원도</option>
-          <option>충청도</option>
-          <option>경상도</option>
-          <option>전라도</option>
-          <option>제주도</option>
-          <option>세종</option>
-        </select>
-
-        <textarea id="reviewInput" rows="6" placeholder="당신의 여행 후기를 적어주세요!"></textarea>
-        <button onclick="clearReview()">등록</button>
+      <label class="field-label">별점</label>
+      <div class="star-box">
+        <span class="star" data-value="1">★</span>
+        <span class="star" data-value="2">★</span>
+        <span class="star" data-value="3">★</span>
+        <span class="star" data-value="4">★</span>
+        <span class="star" data-value="5">★</span>
       </div>
 
+    <label class="field-label" for="reviewInput">후기 내용</label>
+    <textarea id="reviewInput" rows="6" maxlength="300"
+          placeholder="여행 후기를 입력해주세요."></textarea>
 
-
+    <div class="textarea-meta">
+      <span id="charCount">0</span>/300자
     </div>
-  </div>
+
+
+      <button id="submitReview" class="submit-btn">작성 완료</button>
+    </section>
+  </main>
 
   <script>
-    function clearReview() {
-      const text = document.getElementById('reviewInput').value.trim();
-      const region = document.getElementById('regionSelect').value;
+    const API_BASE = "http://localhost:3000";
 
-      if (!text || region === "지역 선택") return;
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("✅ review.html 스크립트 로드됨");
 
-      alert('후기가 등록되었습니다!)');
-      document.getElementById('reviewInput').value = '';
-      document.getElementById('regionSelect').selectedIndex = 0;
-    }
+      let selectedStar = 0;
+      const starBox   = document.querySelector(".star-box");
+      const starElems = document.querySelectorAll(".star");
+      const submitBtn = document.getElementById("submitReview");
+
+      function paintStars(rating) {
+        starElems.forEach(star => {
+          const value = Number(star.dataset.value); // 1~5
+          star.classList.toggle("active", value <= rating);
+        });
+      }
+
+      // 마우스 올리면 해당 별까지 노란색 (미리보기)
+      starElems.forEach(star => {
+        star.addEventListener("mouseenter", () => {
+          const hoverValue = Number(star.dataset.value);
+          paintStars(hoverValue);
+        });
+
+        // 클릭하면 그 값으로 확정 + 다시 칠하기
+        star.addEventListener("click", () => {
+          selectedStar = Number(star.dataset.value);
+          paintStars(selectedStar);
+          console.log("⭐ 선택한 별점:", selectedStar);
+        });
+      });
+
+      // 별 영역에서 마우스 빠져나가면, 선택값 기준으로 복원
+      if (starBox) {
+        starBox.addEventListener("mouseleave", () => {
+          paintStars(selectedStar);
+        });
+      }
+
+      // 작성 완료 버튼 → 서버로 POST
+      submitBtn.addEventListener("click", async () => {
+        const region = document.getElementById("regionSelect").value;
+        const text   = document.getElementById("reviewInput").value.trim();
+
+        if (!text || region === "지역 선택" || !selectedStar) {
+          alert("지역 / 별점 / 내용을 모두 입력하세요!");
+          return;
+        }
+
+        try {
+          const res = await fetch(`${API_BASE}/api/reviews`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              region: region,
+              rating: selectedStar,
+              content: text
+            })
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            console.error("❌ 리뷰 저장 실패:", errData);
+            alert(errData.message || "리뷰 저장 중 오류가 발생했습니다.");
+            return;
+          }
+
+          alert("후기가 등록되었습니다!");
+          // 작성 후 목록 페이지로 이동
+          location.href = "review_list.html";
+        } catch (err) {
+          console.error("❌ 서버 요청 실패:", err);
+          alert("서버에 연결할 수 없습니다. (server.js가 켜져 있는지 확인해주세요)");
+        }
+      });
+    });
   </script>
-
 </body>
-
 </html>
