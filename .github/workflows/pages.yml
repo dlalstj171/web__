@@ -1,0 +1,36 @@
+# .github/workflows/pages.yml
+name: Deploy static site to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]  # 기본 브랜치 이름이 main이면 그대로, master면 master로 바꿔
+
+permissions:
+  contents: read       # 코드 읽기
+  pages: write         # GitHub Pages에 쓰기
+  id-token: write      # 배포 인증용
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload site files
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # 지금 레포 전체를 그대로 올릴 거면 '.'
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
