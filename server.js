@@ -59,7 +59,7 @@ async function initMongo() {
     await client.connect();
     const db = client.db(MONGO_DB);
     reviewLogsCollection = db.collection(MONGO_COLL);
-    console.log('✅ MongoDB 연결 완료:', MONGO_DB, '/', MONGO_COLL);
+    console.log('MongoDB 연결 완료:', MONGO_DB, '/', MONGO_COLL);
   } catch (err) {
     console.error('❌ MongoDB 연결 실패:', err.message);
   }
@@ -179,5 +179,5 @@ app.get('/api/review-logs', async (req, res) => {
 // 6) 서버 시작
 // ===============================
 app.listen(PORT, () => {
-  console.log(`🚀 서버 실행됨 → http://localhost:${PORT}`);
+  console.log(`서버 실행됨 → http://localhost:${PORT}`);
 });
