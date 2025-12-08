@@ -16,6 +16,7 @@
         <li><a href="region.html">| 주요도시 |</a></li>
         <li><a href="review_list.html">| 여행 후기 |</a></li>
         <li><a href="guide.html">| 이용가이드 |</a></li>
+        <li><a href="qna.html">| Q&A |</a></li>
         <li><a href="index.html">| 포트폴리오 |</a></li>
 
       </ul>
@@ -93,6 +94,7 @@
       track.style.transform = `translateX(-${currentSlide * 100}%)`;
       indicator.textContent = `${String(currentSlide + 1).padStart(2, '0')} / 04`;
     }
+    setInterval(nextSlide, 4000);   // 4초마다 다음 슬라이드
 
     function nextSlide() {
       currentSlide = (currentSlide + 1) % totalSlides;
@@ -105,22 +107,22 @@
     }
 
     updateSlide();
-const travelPlaces = [
-  { name: "서울", image: "img/서울/서울.jpg", link: "seoul.html" },
-  { name: "부산", image: "img/부산/부산.jpg", link: "busan.html" },
-  { name: "제주도", image: "img/제주도/제주도.jpg", link: "jeju.html" },
-  { name: "대구", image: "img/대구/대구.jpg", link: "daegu.html" },
-  { name: "대전", image: "img/대전/대전.jpg", link: "daejeon.html" },
-  { name: "광주", image: "img/광주/광주.jpg", link: "gwangju.html" },
-  { name: "울산", image: "img/울산/울산.jpg", link: "ulsan.html" },
-  { name: "세종", image: "img/세종/세종.jpg", link: "sejong.html" },
-  { name: "경기도", image: "img/경기도/경기도.jpg", link: "gyeonggi.html" },
-  { name: "강원도", image: "img/강원도/강원도.jpg", link: "gangwon.html" },
-  { name: "충청도", image: "img/충청도/충청도.jpg", link: "chungcheong.html" },
-  { name: "경상도", image: "img/경상도/경상도.jpg", link: "gyeongsang.html" },
-  { name: "전라도", image: "img/전라도/전라도.jpg", link: "jeolla.html" },
-  { name: "인천", image: "img/인천/인천.jpg", link: "incheon.html" }
-];
+    const travelPlaces = [
+      { name: "서울", image: "img/서울/서울.jpg", link: "seoul.html" },
+      { name: "부산", image: "img/부산/부산.jpg", link: "busan.html" },
+      { name: "제주도", image: "img/제주도/제주도.jpg", link: "jeju.html" },
+      { name: "대구", image: "img/대구/대구.jpg", link: "daegu.html" },
+      { name: "대전", image: "img/대전/대전.jpg", link: "daejeon.html" },
+      { name: "광주", image: "img/광주/광주.jpg", link: "gwangju.html" },
+      { name: "울산", image: "img/울산/울산.jpg", link: "ulsan.html" },
+      { name: "세종", image: "img/세종/세종.jpg", link: "sejong.html" },
+      { name: "경기도", image: "img/경기도/경기도.jpg", link: "gyeonggi.html" },
+      { name: "강원도", image: "img/강원도/강원도.jpg", link: "gangwon.html" },
+      { name: "충청도", image: "img/충청도/충청도.jpg", link: "chungcheong.html" },
+      { name: "경상도", image: "img/경상도/경상도.jpg", link: "gyeongsang.html" },
+      { name: "전라도", image: "img/전라도/전라도.jpg", link: "jeolla.html" },
+      { name: "인천", image: "img/인천/인천.jpg", link: "incheon.html" }
+  ];
 
 function recommendPlace() {
   const random = Math.floor(Math.random() * travelPlaces.length);

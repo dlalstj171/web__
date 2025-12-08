@@ -1,0 +1,129 @@
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #f4f4f0;
+  margin: 0;
+}
+
+/* 가운데 정렬 */
+.qna-page {
+  max-width: 960px;
+  margin: 40px auto 80px;
+  padding: 0 16px;
+}
+
+/* 문의 카드 */
+.qna-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 32px 28px 28px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  margin-bottom: 40px;
+}
+
+.qna-card h1 {
+  font-size: 26px;
+  margin: 0 0 6px;
+}
+
+.qna-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 20px;
+}
+
+/* 라벨 */
+.field-label {
+  display: block;
+  margin: 16px 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 입력 공통 */
+.qna-card input,
+.qna-card select,
+.qna-card textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #d0d0d0;
+  font-size: 14px;
+  box-sizing: border-box;
+  background: #fafafa;
+  outline: none;
+}
+
+.qna-card input:focus,
+.qna-card select:focus,
+.qna-card textarea:focus {
+  border-color: #006644;
+  background: #ffffff;
+}
+
+/* 버튼 재사용 (review.css랑 맞춰도 됨) */
+.submit-btn {
+  margin-top: 24px;
+  width: 100%;
+  padding: 13px 0;
+  border: none;
+  border-radius: 999px;
+  background: #006644;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.submit-btn:hover {
+  background: #005137;
+}
+
+.submit-btn:active {
+  transform: translateY(1px);
+}
+
+/* 글자 수 */
+.textarea-meta {
+  margin-top: 4px;
+  font-size: 12px;
+  text-align: right;
+  color: #888;
+}
+
+/* 최근 Q&A 리스트 */
+.qna-list-section h2 {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.qna-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.qna-item {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+}
+
+.qna-item-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.qna-item-meta {
+  font-size: 12px;
+  color: #777;
+  margin-bottom: 6px;
+}
+
+.qna-item-content {
+  font-size: 13px;
+  color: #444;
+}

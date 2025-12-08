@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Q&A 문의</title>
+
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/qna.css">
+  <script src="js/qna.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="logo"><img src="logo.png" alt="로고"></div>
+    <nav>
+      <ul>
+        <li><a href="main.html">| HOME |</a></li>
+        <li><a href="region.html">| 주요도시 |</a></li>
+        <li><a href="review_list.html">| 여행 후기 |</a></li>
+        <li><a href="guide.html">| 이용가이드 |</a></li>
+        <li><a href="qna.html">| Q&A |</a></li>
+        <li><a href="index.html">| 포트폴리오 |</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="qna-page">
+    <section class="qna-card">
+      <h1>Q&A 문의 남기기</h1>
+      <p class="qna-subtitle">사이트 이용이나 여행지에 대해 궁금한 점을 남겨주세요.</p>
+
+      <label class="field-label" for="qnaRegion">질문 관련 지역</label>
+      <select id="qnaRegion">
+        <option disabled selected>지역 선택</option>
+        <option>서울</option><option>인천</option><option>대전</option>
+        <option>대구</option><option>광주</option><option>부산</option>
+        <option>울산</option><option>경기도</option><option>강원도</option>
+        <option>충청도</option><option>경상도</option><option>전라도</option>
+        <option>제주도</option><option>세종</option>
+      </select>
+
+      <label class="field-label" for="qnaCategory">질문 분류</label>
+      <select id="qnaCategory">
+        <option disabled selected>분류 선택</option>
+        <option value="사이트 이용">사이트 이용</option>
+        <option value="여행지 추천">여행지 추천</option>
+        <option value="기타">기타</option>
+      </select>
+
+      <label class="field-label" for="qnaTitle">질문 제목</label>
+      <input id="qnaTitle" type="text" maxlength="100"
+             placeholder="예: 후기 작성이 안 되는데 어떻게 하나요?" />
+
+      <label class="field-label" for="qnaContent">질문 내용</label>
+      <textarea id="qnaContent" rows="6" maxlength="500"
+                placeholder="궁금한 내용을 자세히 적어주세요."></textarea>
+
+      <div class="textarea-meta">
+        <span id="qnaCharCount">0</span>/500자
+      </div>
+
+      <button id="qnaSubmit" class="submit-btn">질문 등록</button>
+    </section>
+
+    <section class="qna-list-section">
+      <h2>최근 Q&A</h2>
+      <div id="qnaList" class="qna-list"></div>
+    </section>
+  </main>
+</body>
+</html>
