@@ -5,7 +5,7 @@
 // ============================
 const API_BASE = "http://localhost:3000";
 
-console.log("✅ review.js 로드됨");
+console.log(" review.js 로드됨");
 
 // ============================
 // 1) 후기 입력 페이지 (review.html)
@@ -104,7 +104,7 @@ console.log("✅ review.js 로드됨");
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        console.error("❌ 리뷰 저장 실패:", errData);
+        console.error("리뷰 저장 실패:", errData);
         alert(errData.message || "리뷰 저장 중 오류가 발생했습니다.");
         return;
       }
@@ -113,7 +113,7 @@ console.log("✅ review.js 로드됨");
       // 작성 후 목록 페이지로 이동
       location.href = "review_list.html";
     } catch (err) {
-      console.error("❌ 서버 요청 실패:", err);
+      console.error("서버 요청 실패:", err);
       alert("서버에 연결할 수 없습니다. (server.js가 켜져 있는지 확인해주세요)");
     }
   });
@@ -169,7 +169,7 @@ console.log("✅ review.js 로드됨");
         `;
       });
     } catch (err) {
-      console.error("❌ 리뷰 목록 불러오기 실패:", err);
+      console.error("리뷰 목록 불러오기 실패:", err);
       listEl.innerHTML = "<p>리뷰를 불러오는 중 오류가 발생했습니다.</p>";
     }
   }

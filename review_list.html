@@ -58,7 +58,7 @@
   const API_BASE = "http://localhost:3000";
 
   document.addEventListener("DOMContentLoaded", () => {
-    console.log("✅ review_list.html 스크립트 로드됨");
+    console.log("review_list.html 스크립트 로드됨");
 
     const listEl = document.getElementById("reviewList");
     const filterSelect = document.getElementById("filterRegion");
@@ -103,7 +103,7 @@
             `;
           });
         } catch (err) {
-          console.error("❌ 리뷰 목록 불러오기 실패:", err);
+          console.error("리뷰 목록 불러오기 실패:", err);
           listEl.innerHTML = "<p>리뷰를 불러오는 중 오류가 발생했습니다.</p>";
         }
       }

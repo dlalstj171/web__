@@ -6,8 +6,8 @@ const cors    = require('cors');
 const mysql   = require('mysql2/promise');
 const path    = require('path');
 
-// 🔹 MongoDB 드라이버 추가
-const { MongoClient } = require('mongodb');
+// MongoDB 드라이버 추가
+const { MongoClient, ObjectId } = require('mongodb');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -32,36 +32,41 @@ app.use(cors({
 app.use(express.json());
 
 // ===============================
-// 3) MySQL 연결 풀
+// 3) MySQL 연결 풀 (Review + Users)
 // ===============================
+// ※ 본인 MySQL 포트/비밀번호 확인 필수
 const pool = mysql.createPool({
   host: 'localhost',
-  port: 3307,
+  port: 3307,       
   user: 'root',
-  password: '1234',
+  password: '1234',    
   database: 'travel_site',
   waitForConnections: true,
   connectionLimit: 10
 });
 
 // ===============================
-// 3-1) MongoDB 연결 (review_logs 컬렉션)
+// 3-1) MongoDB 연결 (Logs + QnA)
 // ===============================
 const MONGO_URI  = 'mongodb://127.0.0.1:27017';
-const MONGO_DB   = 'travel_logs';
-const MONGO_COLL = 'review_logs';
+const MONGO_DB   = 'travel_logs'; 
 
-let reviewLogsCollection = null; // 연결 후에 세팅됨
+let reviewLogsCollection = null; 
+let qnaCollection = null;        
 
 async function initMongo() {
   try {
     const client = new MongoClient(MONGO_URI);
     await client.connect();
     const db = client.db(MONGO_DB);
-    reviewLogsCollection = db.collection(MONGO_COLL);
-    console.log('MongoDB 연결 완료:', MONGO_DB, '/', MONGO_COLL);
+    
+    // 컬렉션 연결
+    reviewLogsCollection = db.collection('review_logs');
+    qnaCollection = db.collection('qna'); 
+    
+    console.log(`MongoDB 연결 완료: ${MONGO_DB} (review_logs, qna)`);
   } catch (err) {
-    console.error('❌ MongoDB 연결 실패:', err.message);
+    console.error('MongoDB 연결 실패:', err.message);
   }
 }
 initMongo();
@@ -74,34 +79,24 @@ app.get('/', (req, res) => {
 });
 
 // ===============================
-// 5) REST API - 리뷰 저장/조회
+// 5-1) REST API - MySQL (Review)
 // ===============================
 
-// POST /api/reviews : 리뷰 저장
+// 리뷰 저장
 app.post('/api/reviews', async (req, res) => {
   try {
     const { region, rating, content } = req.body;
     const numRating = Number(rating);
 
-    console.log('📥 POST /api/reviews body:', req.body);
-
-    if (!region || !content || !Number.isInteger(numRating) ||
-        numRating < 1 || numRating > 5) {
-      return res
-        .status(400)
-        .json({ message: '지역, 내용, 별점(1~5)을 올바르게 입력해주세요.' });
+    if (!region || !content || !Number.isInteger(numRating)) {
+      return res.status(400).json({ message: '잘못된 입력입니다.' });
     }
 
-    // 1) MySQL에 저장 (기존 기능)
-    const sql = `
-      INSERT INTO review (region, rating, content)
-      VALUES (?, ?, ?)
-    `;
+    // MySQL 저장
+    const sql = `INSERT INTO review (region, rating, content) VALUES (?, ?, ?)`;
     const [result] = await pool.execute(sql, [region, numRating, content]);
 
-    console.log('✅ MySQL 리뷰 저장 성공, insertId =', result.insertId);
-
-    // 2) MongoDB에 로그/백업 저장 (새 기능)
+    // MongoDB 로그 저장
     if (reviewLogsCollection) {
       reviewLogsCollection.insertOne({
         mysqlReviewId: result.insertId,
@@ -109,69 +104,106 @@ app.post('/api/reviews', async (req, res) => {
         rating: numRating,
         content,
         createdAt: new Date(),
-        userAgent: req.headers['user-agent'] || ''
-      }).then(() => {
-        console.log('📦 MongoDB review_logs 에 로그 저장 완료');
-      }).catch(err => {
-        console.error('⚠ MongoDB 로그 저장 실패:', err.message);
+        type: 'REVIEW_BACKUP'
       });
-    } else {
-      console.warn('⚠ MongoDB 미연결 상태라 로그를 저장하지 못함');
     }
 
-    // 최종 응답은 기존처럼 성공 처리
-    res.status(201).json({
-      message: '리뷰가 저장되었습니다.',
-      reviewId: result.insertId
-    });
+    res.status(201).json({ message: '리뷰 저장 성공', reviewId: result.insertId });
   } catch (err) {
-    console.error('❌ POST /api/reviews 에러 코드:', err.code);
-    console.error('❌ POST /api/reviews 에러 메시지:', err.message);
-    res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+    console.error(err);
+    res.status(500).json({ message: '서버 에러' });
   }
 });
 
-// GET /api/reviews : MySQL 리뷰 목록 조회 (기존 기능 그대로)
+// 리뷰 조회
 app.get('/api/reviews', async (req, res) => {
   try {
     const { region } = req.query;
-
-    let sql = 'SELECT id, region, rating, content, created_at FROM review';
+    let sql = 'SELECT * FROM review';
     const params = [];
-
     if (region) {
       sql += ' WHERE region = ?';
       params.push(region);
     }
-
     sql += ' ORDER BY created_at DESC';
-
     const [rows] = await pool.execute(sql, params);
-    console.log(`📤 GET /api/reviews (${region || '전체'}) -> ${rows.length}개`);
     res.json(rows);
   } catch (err) {
-    console.error('❌ GET /api/reviews 에러 코드:', err.code);
-    console.error('❌ GET /api/reviews 에러 메시지:', err.message);
-    res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+    res.status(500).json({ message: '서버 에러' });
   }
 });
 
-// (선택) MongoDB에 쌓인 로그를 확인하는 API
-app.get('/api/review-logs', async (req, res) => {
+// 유저 목록 조회 (MySQL 구색 맞추기용)
+app.get('/api/users', async (req, res) => {
   try {
-    if (!reviewLogsCollection) {
-      return res.status(500).json({ message: 'MongoDB 연결 안 됨' });
-    }
-    const docs = await reviewLogsCollection
-      .find({})
-      .sort({ createdAt: -1 })
-      .limit(50)
-      .toArray();
-
-    res.json(docs);
+    const [rows] = await pool.execute('SELECT id, nickname FROM users');
+    res.json(rows);
   } catch (err) {
-    console.error('❌ GET /api/review-logs 에러:', err.message);
-    res.status(500).json({ message: 'Mongo 로그 조회 중 오류' });
+    res.json([]); 
+  }
+});
+
+// ===============================
+// 5-2) REST API - MongoDB (QnA)
+// ===============================
+
+// 로그 조회
+app.get('/api/review-logs', async (req, res) => {
+  if (!reviewLogsCollection) return res.status(500).json([]);
+  const docs = await reviewLogsCollection.find({}).sort({ createdAt: -1 }).limit(50).toArray();
+  res.json(docs);
+});
+
+// Q&A 목록 조회
+app.get('/api/qna', async (req, res) => {
+  if (!qnaCollection) return res.status(500).json({ message: 'DB 미연결' });
+  const docs = await qnaCollection.find({}).sort({ createdAt: -1 }).toArray();
+  res.json(docs);
+});
+
+// Q&A 질문 등록
+app.post('/api/qna', async (req, res) => {
+  if (!qnaCollection) return res.status(500).json({ message: 'DB 미연결' });
+
+  // 프론트 React에서 보낸 region, category를 여기서 받습니다.
+  const { region, category, title, content, writer } = req.body;
+  
+  const newQna = {
+    region: region || '기타',      // 지역 저장
+    category: category || '일반',  // 분류 저장
+    title,
+    content,
+    writer: writer || '익명',
+    createdAt: new Date(),
+    answers: [] 
+  };
+
+  await qnaCollection.insertOne(newQna);
+  res.json({ success: true });
+});
+
+// 답변 등록
+app.post('/api/qna/reply', async (req, res) => {
+  if (!qnaCollection) return res.status(500).json({ message: 'DB 미연결' });
+  const { qna_id, replier, comment } = req.body;
+
+  try {
+    await qnaCollection.updateOne(
+      { _id: new ObjectId(qna_id) }, 
+      { 
+        $push: { 
+          answers: { 
+            replier, 
+            comment, 
+            createdAt: new Date() 
+          } 
+        } 
+      }
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.error('답변 등록 실패:', err.message);
+    res.status(500).json({ message: '답변 등록 실패' });
   }
 });
 
@@ -179,5 +211,6 @@ app.get('/api/review-logs', async (req, res) => {
 // 6) 서버 시작
 // ===============================
 app.listen(PORT, () => {
-  console.log(`서버 실행됨 → http://localhost:${PORT}`);
+  console.log(`서버 실행됨: http://localhost:${PORT}`);
+  console.log(`MySQL(Review) + MongoDB(QnA) 정상 작동 중`);
 });

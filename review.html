@@ -68,7 +68,7 @@
   const API_BASE = "http://localhost:3000";
 
   document.addEventListener("DOMContentLoaded", () => {
-    console.log("✅ review.html 스크립트 로드됨");
+    console.log("review.html 스크립트 로드됨");
 
     let selectedStar = 0;
     const starBox   = document.querySelector(".star-box");
@@ -93,7 +93,7 @@
       star.addEventListener("click", () => {
         selectedStar = Number(star.dataset.value);
         paintStars(selectedStar);
-        console.log("⭐ 선택한 별점:", selectedStar);
+        console.log("선택한 별점:", selectedStar);
       });
     });
 
@@ -105,7 +105,7 @@
     }
 
 // ============================
-// 🔹 후기 글자 수 카운터
+//  후기 글자 수 카운터
 // ============================
 const textarea    = document.getElementById("reviewInput");
 const charCountEl = document.getElementById("charCount");
@@ -156,7 +156,7 @@ if (textarea && charCountEl) {
 
         if (!res.ok) {
           const errData = await res.json().catch(() => ({}));
-          console.error("❌ 리뷰 저장 실패:", errData);
+          console.error("리뷰 저장 실패:", errData);
           alert(errData.message || "리뷰 저장 중 오류가 발생했습니다.");
           return;
         }
@@ -165,7 +165,7 @@ if (textarea && charCountEl) {
         // 작성 후 목록 페이지로 이동
         location.href = "review_list.html";
       } catch (err) {
-        console.error("❌ 서버 요청 실패:", err);
+        console.error("서버 요청 실패:", err);
         alert("서버에 연결할 수 없습니다. (server.js가 켜져 있는지 확인해주세요)");
       }
     });
