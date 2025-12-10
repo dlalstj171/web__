@@ -5,10 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>여행 후기</title>
 
-  <!-- 공통 헤더/레이아웃 -->
   <link rel="stylesheet" href="css/main.css">
-  <!-- 이 페이지 전용 스타일 -->
   <link rel="stylesheet" href="css/review_list.css">
+  
+  <style>
+    /* 삭제 버튼 스타일 추가 */
+    .delete-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: background 0.3s;
+    }
+    .delete-btn:hover {
+      background-color: #c0392b;
+    }
+    .review-actions {
+      text-align: right;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 
 <body>
@@ -33,7 +52,6 @@
         <p>여행자들의 생생한 후기를 만나보세요.</p>
       </div>
 
-      <!-- 지역 필터 -->
       <div class="filter-bar">
         <label for="filterRegion">지역별 보기</label>
         <select id="filterRegion">
@@ -49,8 +67,7 @@
       <a href="review.html" class="write-btn">후기 작성하기</a>
 
       <div id="reviewList" class="review-list">
-        <!-- 후기 카드들이 JS로 여기 추가됨 -->
-      </div>
+        </div>
     </section>
   </main>
 
@@ -63,59 +80,104 @@
     const listEl = document.getElementById("reviewList");
     const filterSelect = document.getElementById("filterRegion");
 
-      async function loadAndRenderReviews() {
-        listEl.innerHTML = "<p>후기를 불러오는 중입니다...</p>";
+    async function loadAndRenderReviews() {
+      listEl.innerHTML = "<p>후기를 불러오는 중입니다...</p>";
 
-        try {
-          const url = new URL(`${API_BASE}/api/reviews`);
-          if (filterSelect && filterSelect.value) {
-            url.searchParams.set("region", filterSelect.value);
-          }
-
-          const res = await fetch(url);
-          const reviews = await res.json();
-
-          if (!Array.isArray(reviews) || reviews.length === 0) {
-            listEl.innerHTML = "<p>등록된 후기가 없습니다.</p>";
-            return;
-          }
-
-          listEl.innerHTML = "";
-
-          reviews.forEach(r => {
-            const rawRating = Number(r.rating) || 0;
-            const starCount = Math.min(Math.max(rawRating, 0), 5); // 0~5로 제한
-            const dateStr = r.created_at
-              ? new Date(r.created_at).toLocaleString("ko-KR")
-              : "";
-
-            listEl.innerHTML += `
-              <div class="review-card">
-                <div class="stars">
-                  ${"★".repeat(starCount)}${"☆".repeat(5 - starCount)}
-                </div>
-                <div class="review-top">
-                  <div class="review-region">${r.region}</div>
-                  <div class="review-date">${dateStr}</div>
-                </div>
-                <div class="review-content">${r.content}</div>
-              </div>
-            `;
-          });
-        } catch (err) {
-          console.error("리뷰 목록 불러오기 실패:", err);
-          listEl.innerHTML = "<p>리뷰를 불러오는 중 오류가 발생했습니다.</p>";
+      try {
+        const url = new URL(`${API_BASE}/api/reviews`);
+        if (filterSelect && filterSelect.value) {
+          url.searchParams.set("region", filterSelect.value);
         }
-      }
 
-      // 페이지 로드시 자동 로딩
-      loadAndRenderReviews();
+        const res = await fetch(url);
+        const reviews = await res.json();
 
-      // 필터 변경 시 다시 로딩
-      if (filterSelect) {
-        filterSelect.addEventListener("change", loadAndRenderReviews);
+        if (!Array.isArray(reviews) || reviews.length === 0) {
+          listEl.innerHTML = "<p>등록된 후기가 없습니다.</p>";
+          return;
+        }
+
+        listEl.innerHTML = "";
+
+        reviews.forEach(r => {
+          const rawRating = Number(r.rating) || 0;
+          const starCount = Math.min(Math.max(rawRating, 0), 5); 
+          const dateStr = r.created_at
+            ? new Date(r.created_at).toLocaleString("ko-KR")
+            : "";
+
+          // r.nickname은 서버에서 JOIN으로 가져온 작성자 아이디입니다.
+          listEl.innerHTML += `
+            <div class="review-card">
+              <div class="stars">
+                ${"★".repeat(starCount)}${"☆".repeat(5 - starCount)}
+              </div>
+              <div class="review-top">
+                <div class="review-region">${r.region}</div>
+                <div class="review-date">${dateStr}</div>
+              </div>
+              <div class="review-content">${r.content}</div>
+              
+              <div style="font-size: 0.9em; color: #666; margin-top: 5px;">
+                작성자: <strong>${r.nickname}</strong>
+              </div>
+
+              <div class="review-actions">
+                <button onclick="deleteReview(${r.id})" class="delete-btn">삭제</button>
+              </div>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error("리뷰 목록 불러오기 실패:", err);
+        listEl.innerHTML = "<p>리뷰를 불러오는 중 오류가 발생했습니다.</p>";
       }
-    });
+    }
+
+    // 페이지 로드시 자동 로딩
+    loadAndRenderReviews();
+
+    // 필터 변경 시 다시 로딩
+    if (filterSelect) {
+      filterSelect.addEventListener("change", loadAndRenderReviews);
+    }
+  });
+
+  // ============================================
+  // [추가] 삭제 기능 함수 (전역 함수로 선언)
+  // ============================================
+  window.deleteReview = async function(id) {
+    // 1. 비밀번호 입력 받기
+    const password = prompt("삭제하려면 비밀번호를 입력하세요:");
+    
+    // 취소 버튼 누르면 중단
+    if (password === null) return; 
+    if (password.trim() === "") {
+        alert("비밀번호를 입력해야 합니다.");
+        return;
+    }
+
+    try {
+        // 2. 서버로 삭제 요청 (비밀번호 함께 전송)
+        const res = await fetch(`${API_BASE}/api/reviews/${id}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password: password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            alert("삭제되었습니다.");
+            location.reload(); // 새로고침해서 목록 갱신
+        } else {
+            alert(data.message); // "비밀번호가 틀렸습니다" 등
+        }
+    } catch (err) {
+        console.error(err);
+        alert("서버 연결 오류가 발생했습니다.");
+    }
+  };
   </script>
 </body>
 </html>

@@ -43,7 +43,7 @@
         .header-nav a {
             font-size: 0.9rem;
             font-weight: 600;
-            color: #333; /* 기본 검은색/진회색 유지 */
+            color: #333;
             transition: color 0.2s;
         }
 
@@ -87,7 +87,8 @@
                 boxShadow: "0 2px 10px rgba(0,0,0,0.05)", marginBottom: "20px", border: "1px solid #eee"
             },
             button: {
-                backgroundColor: "#007bff", color: "white", padding: "12px 0", border: "none",
+                backgroundColor: "#555", /* [수정됨] 파란색(#007bff) -> 진한 회색(#555) 변경 */
+                color: "white", padding: "12px 0", border: "none",
                 borderRadius: "4px", fontSize: "1rem", fontWeight: "bold", cursor: "pointer", width: "100%"
             }
         };
@@ -150,7 +151,6 @@
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
                             <span style={{ fontSize: "1.1rem", fontWeight: "bold" }}>질문 작성</span>
                             <div style={{ background: "#f1f3f5", padding: "8px 15px", borderRadius: "20px", display: "flex", alignItems: "center", gap: "5px" }}>
-                                {/* 아이콘 제거됨 */}
                                 <span>작성자:</span>
                                 <select value={currentUser} onChange={(e) => setCurrentUser(e.target.value)} style={{ border: "none", background: "transparent", fontWeight: "bold", cursor: "pointer", outline: "none" }}>
                                     <option value="익명">익명</option>
@@ -175,15 +175,15 @@
 
                     {/* 목록 */}
                     <div style={{ marginTop: "40px" }}>
-                        <h3 style={{ borderBottom: "2px solid #333", paddingBottom: "10px", margin: "0 0 20px 0" }}>최근 질문</h3>
+                        <h3 style={{ borderBottom: "2px solid #333", paddingBottom: "10px", margin: "0 0 20px 0", color: "#333" }}>최근 질문</h3>
                         {list.length === 0 ? <div style={{ textAlign: "center", padding: "50px", color: "#999" }}>질문이 없습니다.</div> : 
                             list.map((item, index) => (
                                 <div key={index} style={{ backgroundColor: "white", padding: "20px", borderRadius: "10px", marginBottom: "15px", boxShadow: "0 2px 5px rgba(0,0,0,0.05)" }}>
                                     <div style={{ display: "flex", gap: "8px", marginBottom: "8px", fontSize: "0.85rem" }}>
+                                        {/* [수정됨] 뱃지 색상도 회색으로 변경 */}
                                         <span style={badgeStyle}>{item.region}</span>
                                         <span style={badgeStyle}>{item.category}</span>
-                                        {/* 아이콘 제거됨 */}
-                                        <span style={{ color: "#007bff", fontWeight: "bold" }}>{item.writer}</span>
+                                        <span style={{ color: "#333", fontWeight: "bold" }}>{item.writer}</span>
                                         <span style={{ marginLeft: "auto", color: "#aaa" }}>{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ""}</span>
                                     </div>
                                     <div style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "6px", color: "#333" }}>{item.title}</div>
@@ -197,7 +197,8 @@
         };
 
         const inputStyle = { padding: "12px", border: "1px solid #ddd", borderRadius: "6px", fontSize: "1rem", outline: "none", flex: 1 };
-        const badgeStyle = { backgroundColor: "#e3f2fd", color: "#007bff", padding: "4px 10px", borderRadius: "12px", fontWeight: "500" };
+        // [수정됨] 뱃지 색상을 회색조로 변경 (배경: 연회색, 글자: 진회색)
+        const badgeStyle = { backgroundColor: "#eee", color: "#555", padding: "4px 10px", borderRadius: "12px", fontWeight: "500" };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<Qna />);

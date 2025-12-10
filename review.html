@@ -6,9 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>여행 후기 작성</title>
 
-  <!-- 헤더/메뉴 스타일 공통 사용 -->
   <link rel="stylesheet" href="css/main.css">
-  <!-- 이 페이지 전용 스타일 -->
   <link rel="stylesheet" href="css/review.css">
 </head>
 
@@ -51,14 +49,18 @@
         <span class="star" data-value="5">★</span>
       </div>
 
-    <label class="field-label" for="reviewInput">후기 내용</label>
-    <textarea id="reviewInput" rows="6" maxlength="300"
-          placeholder="여행 후기를 입력해주세요."></textarea>
+      <div class="user-info-box" style="margin-bottom: 15px; display: flex; gap: 10px;">
+        <input type="text" id="writerId" placeholder="아이디" style="padding: 10px; width: 48%; border: 1px solid #ddd; border-radius: 5px;">
+        <input type="password" id="password" placeholder="비밀번호(4자리)" style="padding: 10px; width: 48%; border: 1px solid #ddd; border-radius: 5px;">
+      </div>
 
-    <div class="textarea-meta">
-      <span id="charCount">0</span>/300자
-    </div>
+      <label class="field-label" for="reviewInput">후기 내용</label>
+      <textarea id="reviewInput" rows="6" maxlength="300"
+           placeholder="여행 후기를 입력해주세요."></textarea>
 
+      <div class="textarea-meta">
+        <span id="charCount">0</span>/300자
+      </div>
 
       <button id="submitReview" class="submit-btn">작성 완료</button>
     </section>
@@ -104,42 +106,40 @@
       });
     }
 
-// ============================
-//  후기 글자 수 카운터
-// ============================
-const textarea    = document.getElementById("reviewInput");
-const charCountEl = document.getElementById("charCount");
-const MAX_LEN     = 300;   // maxlength랑 맞춰줌
+    // ============================
+    //  후기 글자 수 카운터
+    // ============================
+    const textarea    = document.getElementById("reviewInput");
+    const charCountEl = document.getElementById("charCount");
+    const MAX_LEN     = 300; 
 
-if (textarea && charCountEl) {
-  const updateCount = () => {
-    // 줄바꿈(\r\n)을 포함한 실제 문자열
-    let text = textarea.value;
-
-    // 300자를 넘으면 강제로 잘라서 300자로 맞춤
-    if (text.length > MAX_LEN) {
-      text = text.slice(0, MAX_LEN);
-      textarea.value = text;
+    if (textarea && charCountEl) {
+      const updateCount = () => {
+        let text = textarea.value;
+        if (text.length > MAX_LEN) {
+          text = text.slice(0, MAX_LEN);
+          textarea.value = text;
+        }
+        charCountEl.textContent = text.length;
+      };
+      textarea.addEventListener("input", updateCount);
+      updateCount();
     }
 
-    // 화면에는 최대 300까지만 표시
-    charCountEl.textContent = text.length;
-  };
-
-  // 타이핑할 때마다 숫자 업데이트
-  textarea.addEventListener("input", updateCount);
-  // 페이지 처음 열릴 때도 한 번 호출
-  updateCount();
-}
-
-
-    // 작성 완료 버튼 → 서버로 POST
+    // ============================
+    //  [중요] 작성 완료 버튼 → 서버로 POST
+    // ============================
     submitBtn.addEventListener("click", async () => {
       const region = document.getElementById("regionSelect").value;
       const text   = document.getElementById("reviewInput").value.trim();
+      
+      // ★ 여기가 수정된 부분입니다! HTML 값을 JS 변수로 가져옵니다.
+      const writerId = document.getElementById("writerId").value.trim();
+      const password = document.getElementById("password").value.trim();
 
-      if (!text || region === "지역 선택" || !selectedStar) {
-        alert("지역 / 별점 / 내용을 모두 입력하세요!");
+      // 유효성 검사에도 아이디/비번 체크 추가
+      if (!text || region === "지역 선택" || !selectedStar || !writerId || !password) {
+        alert("지역, 별점, 내용, 아이디, 비밀번호를 모두 입력하세요!");
         return;
       }
 
@@ -147,10 +147,13 @@ if (textarea && charCountEl) {
         const res = await fetch(`${API_BASE}/api/reviews`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          // ★ 보따리(JSON)에 writerId와 password를 꼭 담아야 합니다!
           body: JSON.stringify({
             region: region,
             rating: selectedStar,
-            content: text
+            content: text,
+            writerId: writerId, // 서버로 전송
+            password: password  // 서버로 전송
           })
         });
 
@@ -162,15 +165,15 @@ if (textarea && charCountEl) {
         }
 
         alert("후기가 등록되었습니다!");
-        // 작성 후 목록 페이지로 이동
         location.href = "review_list.html";
+        
       } catch (err) {
         console.error("서버 요청 실패:", err);
         alert("서버에 연결할 수 없습니다. (server.js가 켜져 있는지 확인해주세요)");
       }
     });
   });
-</script>
+  </script>
 
 </body>
 </html>
