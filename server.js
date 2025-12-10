@@ -1,32 +1,68 @@
 const express = require('express');
 const cors    = require('cors');
 const mysql   = require('mysql2/promise');
+const multer  = require('multer');
 const path    = require('path');
+const fs      = require('fs');
 const { MongoClient, ObjectId } = require('mongodb');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// 정적 파일 경로 설정
+// ===============================================
+// 0. [핵심 수정] 업로드 폴더 절대 경로 설정
+// ===============================================
+// __dirname: 현재 server.js가 있는 진짜 위치 (C:\Users\...)
+// uploadDir: 그 안에 있는 uploads 폴더의 전체 주소
+const uploadDir = path.join(__dirname, 'uploads');
+
+// 폴더가 없으면 만듭니다. (ENOENT 에러 방지)
+if (!fs.existsSync(uploadDir)) {
+    console.log('ftp: uploads 폴더가 없어 새로 생성합니다 -> ' + uploadDir);
+    fs.mkdirSync(uploadDir);
+}
+
+// 정적 파일 경로 설정 (외부에서 접근 가능하게)
+app.use('/uploads', express.static(uploadDir));
 app.use(express.static(__dirname));
+
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // ===============================================
-// 1. MySQL 연결 설정
+// 1. Multer 설정 (위에서 만든 절대 경로 사용)
+// ===============================================
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    // 절대 경로 변수(uploadDir) 대신 그냥 문자열 'uploads/'를 쓰세요.
+    // 이게 윈도우 한글 경로 문제에서 훨씬 안전합니다.
+    cb(null, 'uploads/'); 
+  },
+  filename: (req, file, cb) => {
+    // 한글 파일 깨짐 방지
+    file.originalname = Buffer.from(file.originalname, 'latin1').toString('utf8');
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage: storage });
+
+// ===============================================
+// 2. MySQL 연결 설정
 // ===============================================
 const pool = mysql.createPool({
   host: 'localhost',
-  port: 3307,          // 포트 번호 확인
+  port: 3307,        
   user: 'root',
-  password: '1234',    // 비밀번호 확인
+  password: '1234',  
   database: 'travel_site',
   waitForConnections: true,
   connectionLimit: 10
 });
 
 // ===============================================
-// 2. MongoDB 연결 (옵션)
+// 3. MongoDB 연결
 // ===============================================
 const MONGO_URI  = 'mongodb://127.0.0.1:27017';
 const MONGO_DB   = 'travel_logs'; 
@@ -48,9 +84,9 @@ async function initMongo() {
 initMongo();
 
 // ===============================================
-// 3. 리뷰 작성 API (자동 회원가입 + 트랜잭션)
+// 4. 리뷰 작성 API
 // ===============================================
-app.post('/api/reviews', async (req, res) => {
+app.post('/api/reviews', upload.single('image'), async (req, res) => {
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction(); 
@@ -58,10 +94,14 @@ app.post('/api/reviews', async (req, res) => {
     const { region, rating, content, writerId, password } = req.body;
     const numRating = Number(rating);
 
+    // 이미지 경로 저장 (윈도우 역슬래시 문제 해결)
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+
     if (!region || !content || !writerId || !password) {
       connection.release();
       return res.status(400).json({ message: '모든 항목을 입력해주세요.' });
     }
+    // ▲ [수정완료] 여기에 있던 'W' 오타를 지웠습니다!
 
     // 사용자 확인
     const [existingUsers] = await connection.execute(
@@ -87,14 +127,15 @@ app.post('/api/reviews', async (req, res) => {
     }
 
     // 리뷰 저장
-    const sql = `INSERT INTO reviews (user_id, region, rating, content) VALUES (?, ?, ?, ?)`;
-    const [result] = await connection.execute(sql, [finalUserId, region, numRating, content]);
+    const sql = `INSERT INTO reviews (user_id, region, rating, content, image_path) VALUES (?, ?, ?, ?, ?)`;
+    const [result] = await connection.execute(sql, [finalUserId, region, numRating, content, imagePath]);
 
     // 로그 저장
     if (reviewLogsCollection) {
       reviewLogsCollection.insertOne({
         mysqlReviewId: result.insertId,
         writerId, region, rating: numRating, content,
+        hasImage: !!imagePath,
         createdAt: new Date(), type: 'REVIEW_NEW'
       });
     }
@@ -116,14 +157,14 @@ app.post('/api/reviews', async (req, res) => {
 });
 
 // ===============================================
-// 4. 리뷰 조회 API (JOIN 사용)
+// 5. 리뷰 조회 API
 // ===============================================
 app.get('/api/reviews', async (req, res) => {
   try {
     const { region } = req.query;
 
     let sql = `
-      SELECT r.id, r.region, r.rating, r.content, r.created_at, u.username as nickname
+      SELECT r.id, r.region, r.rating, r.content, r.image_path, r.created_at, u.username as nickname
       FROM reviews r
       JOIN users u ON r.user_id = u.id
     `;
@@ -144,7 +185,7 @@ app.get('/api/reviews', async (req, res) => {
 });
 
 // ===============================================
-// 5. QnA API (MongoDB)
+// 6. QnA API & 삭제 API (기존 유지)
 // ===============================================
 app.get('/api/qna', async (req, res) => {
   if (!qnaCollection) return res.status(500).json({ message: 'DB 미연결' });
@@ -176,17 +217,13 @@ app.post('/api/qna/reply', async (req, res) => {
   } catch (err) { res.status(500).json({ message: '답변 실패' }); }
 });
 
-// ===============================================
-// 6. 리뷰 삭제 API (최종 하나만 남김)
-// ===============================================
 app.delete('/api/reviews/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { password } = req.body; 
 
-    // 비밀번호 확인
     const [rows] = await pool.execute(
-      `SELECT r.id FROM reviews r 
+      `SELECT r.id, r.image_path FROM reviews r 
        JOIN users u ON r.user_id = u.id 
        WHERE r.id = ? AND u.password = ?`,
       [id, password]
@@ -195,19 +232,14 @@ app.delete('/api/reviews/:id', async (req, res) => {
     if (rows.length === 0) {
       return res.status(403).json({ message: '비밀번호가 틀렸거나 이미 삭제된 글입니다.' });
     }
-
-    // 삭제 실행
     await pool.execute('DELETE FROM reviews WHERE id = ?', [id]);
-    
     res.json({ message: '삭제되었습니다.' });
-
   } catch (err) {
     console.error('삭제 에러:', err);
     res.status(500).json({ message: '서버 에러' });
   }
 });
 
-// 서버 시작
 app.listen(PORT, () => {
   console.log(`서버 실행 중: http://localhost:${PORT}`);
 });

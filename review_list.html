@@ -71,113 +71,116 @@
     </section>
   </main>
 
-  <script>
+<script>
   const API_BASE = "http://localhost:3000";
 
-  document.addEventListener("DOMContentLoaded", () => {
-    console.log("review_list.html 스크립트 로드됨");
-
-    const listEl = document.getElementById("reviewList");
-    const filterSelect = document.getElementById("filterRegion");
-
-    async function loadAndRenderReviews() {
-      listEl.innerHTML = "<p>후기를 불러오는 중입니다...</p>";
-
-      try {
-        const url = new URL(`${API_BASE}/api/reviews`);
-        if (filterSelect && filterSelect.value) {
-          url.searchParams.set("region", filterSelect.value);
-        }
-
-        const res = await fetch(url);
-        const reviews = await res.json();
-
-        if (!Array.isArray(reviews) || reviews.length === 0) {
-          listEl.innerHTML = "<p>등록된 후기가 없습니다.</p>";
-          return;
-        }
-
-        listEl.innerHTML = "";
-
-        reviews.forEach(r => {
-          const rawRating = Number(r.rating) || 0;
-          const starCount = Math.min(Math.max(rawRating, 0), 5); 
-          const dateStr = r.created_at
-            ? new Date(r.created_at).toLocaleString("ko-KR")
-            : "";
-
-          // r.nickname은 서버에서 JOIN으로 가져온 작성자 아이디입니다.
-          listEl.innerHTML += `
-            <div class="review-card">
-              <div class="stars">
-                ${"★".repeat(starCount)}${"☆".repeat(5 - starCount)}
-              </div>
-              <div class="review-top">
-                <div class="review-region">${r.region}</div>
-                <div class="review-date">${dateStr}</div>
-              </div>
-              <div class="review-content">${r.content}</div>
-              
-              <div style="font-size: 0.9em; color: #666; margin-top: 5px;">
-                작성자: <strong>${r.nickname}</strong>
-              </div>
-
-              <div class="review-actions">
-                <button onclick="deleteReview(${r.id})" class="delete-btn">삭제</button>
-              </div>
-            </div>
-          `;
-        });
-      } catch (err) {
-        console.error("리뷰 목록 불러오기 실패:", err);
-        listEl.innerHTML = "<p>리뷰를 불러오는 중 오류가 발생했습니다.</p>";
-      }
-    }
-
-    // 페이지 로드시 자동 로딩
-    loadAndRenderReviews();
-
-    // 필터 변경 시 다시 로딩
-    if (filterSelect) {
-      filterSelect.addEventListener("change", loadAndRenderReviews);
-    }
-  });
-
-  // ============================================
-  // [추가] 삭제 기능 함수 (전역 함수로 선언)
-  // ============================================
-  window.deleteReview = async function(id) {
-    // 1. 비밀번호 입력 받기
-    const password = prompt("삭제하려면 비밀번호를 입력하세요:");
+  async function fetchReviews() {
+    const container = document.getElementById('reviewListContainer'); 
+    // (위 ID는 실제 html에 있는 목록 담는 div id여야 합니다. 
+    // 혹시 id가 다르다면 확인해주세요. 보통 'review-list' 등으로 되어있을 수 있습니다.)
     
-    // 취소 버튼 누르면 중단
-    if (password === null) return; 
-    if (password.trim() === "") {
-        alert("비밀번호를 입력해야 합니다.");
+    // 만약 container를 못 찾으면 에러 나니까 안전장치
+    const listElement = document.querySelector('.review-list') || document.getElementById('reviewList');
+    
+    if (!listElement) {
+        console.error("리뷰 목록을 넣을 div를 찾지 못했습니다.");
         return;
     }
+    
+    // 초기화
+    listElement.innerHTML = "<p>로딩 중...</p>";
 
     try {
-        // 2. 서버로 삭제 요청 (비밀번호 함께 전송)
-        const res = await fetch(`${API_BASE}/api/reviews/${id}`, {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ password: password })
-        });
+      // 1. 서버에서 리뷰 데이터 가져오기
+      const res = await fetch(`${API_BASE}/api/reviews`);
+      const reviews = await res.json();
 
-        const data = await res.json();
+      listElement.innerHTML = ""; // 로딩 글씨 지우기
 
-        if (res.ok) {
-            alert("삭제되었습니다.");
-            location.reload(); // 새로고침해서 목록 갱신
-        } else {
-            alert(data.message); // "비밀번호가 틀렸습니다" 등
+      if (reviews.length === 0) {
+        listElement.innerHTML = "<p>등록된 리뷰가 없습니다.</p>";
+        return;
+      }
+
+      // 2. 리뷰 하나씩 화면에 그리기
+      reviews.forEach(review => {
+        
+        // ★ [핵심] 사진이 있는지 확인하는 코드
+        // DB에 image_path가 있으면 <img> 태그를 만들고, 없으면 빈칸('')으로 둡니다.
+        let imageHtml = '';
+        if (review.image_path) {
+            imageHtml = `
+              <div style="margin-top: 10px;">
+                <img src="${API_BASE}${review.image_path}" 
+                     alt="여행 사진" 
+                     style="max-width: 150px; height: auto; border-radius: 8px; border: 1px solid #ddd;">
+              </div>
+            `;
         }
+
+        // 별점(숫자) -> 별 모양(★)으로 바꾸기
+        const starStr = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+        const dateStr = new Date(review.created_at).toLocaleString();
+
+        // HTML 조립
+        const html = `
+          <div class="review-item" style="border: 1px solid #eee; padding: 15px; margin-bottom: 15px; border-radius: 10px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <div>
+                <span style="background: #eef; color: #33a; padding: 3px 8px; border-radius: 4px; font-size: 0.8em; margin-right: 5px;">
+                  ${review.region}
+                </span>
+                <span style="color: #f39c12; font-weight: bold;">${starStr}</span>
+              </div>
+              <div style="font-size: 0.8em; color: #888;">${dateStr}</div>
+            </div>
+
+            <div style="font-weight: bold; margin-bottom: 5px;">${review.content}</div>
+            
+            ${imageHtml}
+
+            <div style="margin-top: 10px; font-size: 0.9em; color: #666; display: flex; justify-content: space-between;">
+              <span>작성자: <strong>${review.nickname || review.writerId || '익명'}</strong></span>
+              <button onclick="deleteReview(${review.id})" style="background: #ff5555; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">삭제</button>
+            </div>
+          </div>
+        `;
+
+        listElement.insertAdjacentHTML('beforeend', html);
+      });
+
     } catch (err) {
-        console.error(err);
-        alert("서버 연결 오류가 발생했습니다.");
+      console.error(err);
+      listElement.innerHTML = "<p>리뷰를 불러오는 데 실패했습니다.</p>";
     }
-  };
-  </script>
+  }
+
+  // 삭제 기능 (기존 유지)
+  async function deleteReview(id) {
+    const password = prompt("리뷰 삭제를 위해 비밀번호를 입력해주세요.");
+    if (!password) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/reviews/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+        alert("삭제되었습니다.");
+        fetchReviews(); // 목록 새로고침
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      alert("삭제 중 오류 발생");
+    }
+  }
+
+  // 페이지 열리면 실행
+  document.addEventListener('DOMContentLoaded', fetchReviews);
+</script>
 </body>
 </html>

@@ -23,6 +23,8 @@
         <li><a href="index.html">| 포트폴리오 |</a></li>
       </ul>
     </nav>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@1.0.0"></script>
   </header>
 
   <main class="review-write-page">
@@ -48,7 +50,17 @@
         <span class="star" data-value="4">★</span>
         <span class="star" data-value="5">★</span>
       </div>
-
+<div style="margin: 20px 0; padding: 15px; border: 2px dashed #3498db; border-radius: 10px; background: #f0f8ff;">
+  <h3 style="margin-top: 0; color: #2980b9;">AI 사진 분석 (TensorFlow.js)</h3>
+  <p style="font-size: 0.9em; color: #666;">여행 사진을 올리면 인공지능이 자동으로 분석합니다.</p>
+  
+  <input type="file" id="imageUpload" accept="image/*" onchange="previewImage(event)">
+  <br><br>
+  
+  <img id="imagePreview" src="" alt="미리보기" style="display:none; max-width: 100%; height: auto; border-radius: 5px; margin-bottom: 10px;">
+  
+  <div id="aiResult" style="font-weight: bold; color: #2c3e50;"></div>
+</div>
       <div class="user-info-box" style="margin-bottom: 15px; display: flex; gap: 10px;">
         <input type="text" id="writerId" placeholder="아이디" style="padding: 10px; width: 48%; border: 1px solid #ddd; border-radius: 5px;">
         <input type="password" id="password" placeholder="비밀번호(4자리)" style="padding: 10px; width: 48%; border: 1px solid #ddd; border-radius: 5px;">
@@ -65,102 +77,206 @@
       <button id="submitReview" class="submit-btn">작성 완료</button>
     </section>
   </main>
-
-  <script>
+<script>
   const API_BASE = "http://localhost:3000";
+  let net; // AI 모델 담을 변수
 
+  // ==========================================
+  // 1. AI 모델 로드 (페이지 열리자마자 실행)
+  // ==========================================
+  async function loadModel() {
+    const resultDiv = document.getElementById('aiResult');
+    if(resultDiv) resultDiv.innerText = "AI 모델을 불러오는 중입니다...";
+    
+    try {
+      // 구글 MobileNet 모델 로드
+      net = await mobilenet.load();
+      console.log("AI 모델 로딩 완료!");
+      if(resultDiv) resultDiv.innerText = "AI 모델 준비 완료! 사진을 선택하세요.";
+    } catch (e) {
+      console.error("모델 로딩 실패:", e);
+      if(resultDiv) resultDiv.innerText = "모델 로딩 실패 (인터넷 연결 확인)";
+    }
+  }
+  loadModel(); 
+
+  // ==========================================
+  // 2. 한글 번역 사전 & 변환 함수
+  // ==========================================
+  const translationMap = {
+      // [풍경/장소]
+      "pier": "부두 / 잔교", "dock": "선착장", "dockage": "선착장",
+      "docking facility": "접안 시설", "seashore": "해변가", "coast": "해안",
+      "seacoast": "바닷가", "sea-coast": "해안선", "promontory": "절벽 / 곶",
+      "headland": "곶", "valley": "계곡", "alp": "높은 산맥",
+      "volcano": "화산", "lakeside": "호숫가", "sandbar": "모래톱",
+      "coral reef": "산호초", "geyser": "간헐천", "fountain": "분수",
+      
+      // [건물/구조물]
+      "beacon": "등대", "lighthouse": "등대", "castle": "성 / 성곽",
+      "palace": "궁전", "monastery": "수도원", "library": "도서관",
+      "church": "교회 / 성당", "mosque": "모스크", "restaurant": "식당",
+      "cinema": "영화관", "theater": "극장", "suspension bridge": "현수교 (다리)",
+      "viaduct": "육교", "barn": "헛간", "greenhouse": "온실",
+
+      // [교통]
+      "airliner": "여객기", "warplane": "전투기", "airship": "비행선",
+      "balloon": "열기구", "liner": "여객선", "container ship": "컨테이너선",
+      "lifeboat": "구명보트", "speedboat": "스피드보트", "sports car": "스포츠카",
+      "convertible": "오픈카", "minivan": "승합차", "steam locomotive": "증기 기관차",
+      "bullet train": "고속 열차",
+
+      // [음식/기타]
+      "coffee mug": "머그컵 / 커피", "espresso": "에스프레소", "cup": "컵",
+      "bakery": "빵집", "pizza": "피자", "hotdog": "핫도그",
+      "hamburger": "햄버거", "ice cream": "아이스크림",
+      "golden retriever": "골든 리트리버", "labrador retriever": "래브라도",
+      "tabby": "얼룩 고양이", "persian cat": "페르시아 고양이"
+  };
+
+  function translateToKorean(englishName) {
+      const words = englishName.split(',').map(w => w.trim().toLowerCase());
+      for (let word of words) {
+          if (translationMap[word]) return translationMap[word];
+      }
+      return englishName; // 사전에 없으면 영어 그대로 출력
+  }
+
+  // ==========================================
+  // 3. 사진 선택 시 미리보기 & 분석 실행
+  // ==========================================
+  function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function() {
+      const output = document.getElementById('imagePreview');
+      output.src = reader.result;
+      output.style.display = 'block';
+      
+      // 이미지가 화면에 뜨면(onload) 분석 시작
+      output.onload = () => classifyImage(output);
+    };
+    if(event.target.files[0]) {
+        reader.readAsDataURL(event.target.files[0]);
+    }
+  }
+
+  // ==========================================
+  // 4. AI 분석 실행 함수 (한글 적용됨)
+  // ==========================================
+  async function classifyImage(imgElement) {
+      const resultDiv = document.getElementById('aiResult');
+      resultDiv.innerText = " AI가 열심히 분석 중입니다...";
+
+      try {
+          if (!net) {
+              resultDiv.innerText = "모델이 아직 로딩되지 않았습니다. 잠시만 기다려주세요.";
+              return;
+          }
+
+          const result = await net.classify(imgElement);
+          console.log("분석 결과:", result); 
+
+          let resultText = " AI 분석 결과:\n";
+          
+          result.forEach((item, index) => {
+              const koreanName = translateToKorean(item.className);
+              const prob = (item.probability * 100).toFixed(1);
+
+              if (index === 0) {
+                  resultText += ` [${koreanName}] - ${prob}%\n`;
+              } else {
+                  resultText += `  - ${koreanName} (${prob}%)\n`;
+              }
+          });
+          resultDiv.innerText = resultText;
+
+      } catch (error) {
+          console.error(error);
+          resultDiv.innerText = "분석 중 오류가 발생했습니다. (F12 콘솔 확인)";
+      }
+  }
+
+  // ==========================================
+  // 5. 페이지 로드 후 이벤트 설정 (별점, 전송 등)
+  // ==========================================
   document.addEventListener("DOMContentLoaded", () => {
-    console.log("review.html 스크립트 로드됨");
+    console.log("스크립트 초기화 완료");
 
     let selectedStar = 0;
     const starBox   = document.querySelector(".star-box");
     const starElems = document.querySelectorAll(".star");
     const submitBtn = document.getElementById("submitReview");
 
+    // 별점 기능
     function paintStars(rating) {
       starElems.forEach(star => {
-        const value = Number(star.dataset.value); // 1~5
+        const value = Number(star.dataset.value);
         star.classList.toggle("active", value <= rating);
       });
     }
 
-    // 마우스 올리면 해당 별까지 노란색 (미리보기)
     starElems.forEach(star => {
-      star.addEventListener("mouseenter", () => {
-        const hoverValue = Number(star.dataset.value);
-        paintStars(hoverValue);
-      });
-
-      // 클릭하면 그 값으로 확정 + 다시 칠하기
+      star.addEventListener("mouseenter", () => paintStars(Number(star.dataset.value)));
       star.addEventListener("click", () => {
         selectedStar = Number(star.dataset.value);
         paintStars(selectedStar);
-        console.log("선택한 별점:", selectedStar);
       });
     });
 
-    // 별 영역에서 마우스 빠져나가면, 선택값 기준으로 복원
     if (starBox) {
-      starBox.addEventListener("mouseleave", () => {
-        paintStars(selectedStar);
-      });
+      starBox.addEventListener("mouseleave", () => paintStars(selectedStar));
     }
 
-    // ============================
-    //  후기 글자 수 카운터
-    // ============================
+    // 글자수 세기
     const textarea    = document.getElementById("reviewInput");
     const charCountEl = document.getElementById("charCount");
-    const MAX_LEN     = 300; 
-
     if (textarea && charCountEl) {
-      const updateCount = () => {
+      textarea.addEventListener("input", () => {
         let text = textarea.value;
-        if (text.length > MAX_LEN) {
-          text = text.slice(0, MAX_LEN);
+        if (text.length > 300) {
+          text = text.slice(0, 300);
           textarea.value = text;
         }
         charCountEl.textContent = text.length;
-      };
-      textarea.addEventListener("input", updateCount);
-      updateCount();
+      });
     }
 
-    // ============================
-    //  [중요] 작성 완료 버튼 → 서버로 POST
-    // ============================
+    // [전송 버튼] 클릭 시 (사진 업로드 포함)
     submitBtn.addEventListener("click", async () => {
       const region = document.getElementById("regionSelect").value;
       const text   = document.getElementById("reviewInput").value.trim();
-      
-      // ★ 여기가 수정된 부분입니다! HTML 값을 JS 변수로 가져옵니다.
       const writerId = document.getElementById("writerId").value.trim();
       const password = document.getElementById("password").value.trim();
+      
+      const imageInput = document.getElementById("imageUpload");
+      const imageFile  = imageInput.files[0];
 
-      // 유효성 검사에도 아이디/비번 체크 추가
       if (!text || region === "지역 선택" || !selectedStar || !writerId || !password) {
         alert("지역, 별점, 내용, 아이디, 비밀번호를 모두 입력하세요!");
         return;
       }
 
+      // FormData 포장
+      const formData = new FormData();
+      formData.append("region", region);
+      formData.append("rating", selectedStar);
+      formData.append("content", text);
+      formData.append("writerId", writerId);
+      formData.append("password", password);
+
+      if (imageFile) {
+        formData.append("image", imageFile);
+      }
+
       try {
         const res = await fetch(`${API_BASE}/api/reviews`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          // ★ 보따리(JSON)에 writerId와 password를 꼭 담아야 합니다!
-          body: JSON.stringify({
-            region: region,
-            rating: selectedStar,
-            content: text,
-            writerId: writerId, // 서버로 전송
-            password: password  // 서버로 전송
-          })
+          body: formData 
         });
 
         if (!res.ok) {
           const errData = await res.json().catch(() => ({}));
-          console.error("리뷰 저장 실패:", errData);
-          alert(errData.message || "리뷰 저장 중 오류가 발생했습니다.");
+          alert(errData.message || "오류가 발생했습니다.");
           return;
         }
 
@@ -168,12 +284,12 @@
         location.href = "review_list.html";
         
       } catch (err) {
-        console.error("서버 요청 실패:", err);
-        alert("서버에 연결할 수 없습니다. (server.js가 켜져 있는지 확인해주세요)");
+        console.error("전송 실패:", err);
+        alert("서버 연결 실패");
       }
     });
   });
-  </script>
+</script>
 
 </body>
 </html>
