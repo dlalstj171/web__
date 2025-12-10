@@ -87,7 +87,7 @@
                 boxShadow: "0 2px 10px rgba(0,0,0,0.05)", marginBottom: "20px", border: "1px solid #eee"
             },
             button: {
-                backgroundColor: "#555", /* [수정됨] 파란색(#007bff) -> 진한 회색(#555) 변경 */
+                backgroundColor: "#555",
                 color: "white", padding: "12px 0", border: "none",
                 borderRadius: "4px", fontSize: "1rem", fontWeight: "bold", cursor: "pointer", width: "100%"
             }
@@ -95,26 +95,18 @@
 
         const Qna = () => {
             const [list, setList] = useState([]);
-            const [users, setUsers] = useState([]);
-            const [currentUser, setCurrentUser] = useState("익명");
+            // const [users, setUsers] = useState([]); // 유저 목록 불러오기 삭제 (필요 없음)
+            // const [currentUser, setCurrentUser] = useState("익명"); // 작성자 선택 상태 삭제
             const [inputs, setInputs] = useState({ region: "지역 선택", category: "분류 선택", title: "", content: "" });
             const regions = ["서울", "경기", "인천", "강원", "충청", "대전", "세종", "전라", "광주", "경상", "대구", "부산", "울산", "제주"];
 
-            useEffect(() => { fetchList(); fetchUsers(); }, []);
+            useEffect(() => { fetchList(); }, []); // fetchUsers 제거
 
             const fetchList = async () => {
                 try {
                     const res = await fetch(`${API_BASE}/api/qna`);
                     const data = await res.json();
                     setList(Array.isArray(data) ? data : []);
-                } catch (err) { console.error(err); }
-            };
-
-            const fetchUsers = async () => {
-                try {
-                    const res = await fetch(`${API_BASE}/api/users`);
-                    const data = await res.json();
-                    setUsers(Array.isArray(data) ? data : []);
                 } catch (err) { console.error(err); }
             };
 
@@ -130,7 +122,8 @@
                 try {
                     const res = await fetch(`${API_BASE}/api/qna`, {
                         method: "POST", headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ ...inputs, writer: currentUser })
+                        // ★ [핵심 수정] writer를 무조건 "익명"으로 고정해서 보냄
+                        body: JSON.stringify({ ...inputs, writer: "익명" })
                     });
                     if (res.ok) {
                         alert("등록되었습니다.");
@@ -150,13 +143,9 @@
                     <div style={styles.card}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
                             <span style={{ fontSize: "1.1rem", fontWeight: "bold" }}>질문 작성</span>
-                            <div style={{ background: "#f1f3f5", padding: "8px 15px", borderRadius: "20px", display: "flex", alignItems: "center", gap: "5px" }}>
-                                <span>작성자:</span>
-                                <select value={currentUser} onChange={(e) => setCurrentUser(e.target.value)} style={{ border: "none", background: "transparent", fontWeight: "bold", cursor: "pointer", outline: "none" }}>
-                                    <option value="익명">익명</option>
-                                    {users.map(u => <option key={u.id} value={u.nickname}>{u.nickname}</option>)}
-                                </select>
-                            </div>
+                            
+                            {/* ★ [삭제됨] 여기에 있던 작성자 선택(select) 박스를 지웠습니다. */}
+                            
                         </div>
 
                         <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
@@ -180,7 +169,6 @@
                             list.map((item, index) => (
                                 <div key={index} style={{ backgroundColor: "white", padding: "20px", borderRadius: "10px", marginBottom: "15px", boxShadow: "0 2px 5px rgba(0,0,0,0.05)" }}>
                                     <div style={{ display: "flex", gap: "8px", marginBottom: "8px", fontSize: "0.85rem" }}>
-                                        {/* [수정됨] 뱃지 색상도 회색으로 변경 */}
                                         <span style={badgeStyle}>{item.region}</span>
                                         <span style={badgeStyle}>{item.category}</span>
                                         <span style={{ color: "#333", fontWeight: "bold" }}>{item.writer}</span>
@@ -197,7 +185,6 @@
         };
 
         const inputStyle = { padding: "12px", border: "1px solid #ddd", borderRadius: "6px", fontSize: "1rem", outline: "none", flex: 1 };
-        // [수정됨] 뱃지 색상을 회색조로 변경 (배경: 연회색, 글자: 진회색)
         const badgeStyle = { backgroundColor: "#eee", color: "#555", padding: "4px 10px", borderRadius: "12px", fontWeight: "500" };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
