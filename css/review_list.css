@@ -52,7 +52,7 @@ body {
 /* 작성 버튼 (a 태그용) */
 .write-btn {
   display: inline-block;
-  background: #006644;
+  background:#6c757d;
   color: #fff;
   padding: 10px 20px;
   border-radius: 999px;
@@ -63,7 +63,7 @@ body {
 }
 
 .write-btn:hover {
-  background: #005137;
+  background:#6c757d;
 }
 
 /* 후기 목록 */

@@ -3,140 +3,215 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>국내 여행지 정보 사이트</title>
-  <link rel="stylesheet" href="css/main.css">
+  <title>Premium Travel Guide</title>
   
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Inter', 'Noto Sans KR', sans-serif; overflow-x: hidden; margin: 0; padding: 0; }
+    
+    /* [헤더 스타일] 높이를 80px로 고정 */
+    header {
+      background-color: #cecbcb !important;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0px 40px;
+      border-bottom: 1px solid #eee;
+      height: 80px; 
+      width: 100%;
+      position: fixed;
+      top: 0;
+      z-index: 1000;
+    }
+    .logo img { height: 55px; } /* 헤더 높이에 맞춰 로고 크기 살짝 조정 */
+    nav ul { list-style: none; display: flex; gap: 24px; margin: 0; padding: 0; }
+    nav a { text-decoration: none; color: #222; font-size: 0.9rem; font-weight: 500; white-space: nowrap; }
+
+    /* [동적 효과] */
+    .zoom-container { overflow: hidden; border-radius: 1.5rem; }
+    .zoom-image { transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+    .zoom-container:hover .zoom-image { transform: scale(1.1); }
+    .slide-fade { transition: opacity 1.2s ease-in-out; }
+    html { scroll-behavior: smooth; }
+  </style>
 </head>
-<body>
-  <header>
-    <div class="logo"><img src="logo.png" alt="로고"></div>
-    <nav>
-      <ul>
-        <li><a href="main.html">| HOME |</a></li>
-        <li><a href="region.html">| 주요도시 |</a></li>
-        <li><a href="review_list.html">| 여행 후기 |</a></li>
-        <li><a href="guide.html">| 이용가이드 |</a></li>
-        <li><a href="qna.html">| Q&A |</a></li>
-        <li><a href="index.html">| 포트폴리오 |</a></li>
+<body class="bg-slate-50 text-slate-900">
 
-      </ul>
-    </nav>
-  </header>
-<section class="carousel">
-  <div class="carousel-track" id="carousel-track">
-    <div class="carousel-slide">
-      <img src="img/서울/seoul.jpg" alt="서울">
-      <div class="overlay">대한민국의 수도, 전통과 현대가 공존하는 서울</div>
-    </div>
-    <div class="carousel-slide">
-      <img src="img/강원도/강릉.jpg" alt="강릉">
-      <div class="overlay">동해 바다를 품은 강원도 강릉</div>
-    </div>
-    <div class="carousel-slide">
-      <img src="img/전라도/담양.png" alt="담양">
-      <div class="overlay">대나무 숲으로 유명한 전라남도 담양</div>
-    </div>
-    <div class="carousel-slide">
-      <img src="img/제주도/제주.jpg" alt="제주도">
-      <div class="overlay">푸른 바다와 오름이 펼쳐지는 제주도</div>
-    </div>
-  </div>
-</section>
+  <div id="root"></div>
 
-  <div class="carousel-indicator">
-    <button onclick="prevSlide()">◀</button>
-    <span id="slide-indicator">01 / 04</span>
-    <button onclick="nextSlide()">▶</button>
-  </div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
 
-<section class="top-destinations">
-  <h2>TOP 3 여행지</h2>
-  <p>서울, 부산, 대전에서 만나는 다양한 매력</p>
-  <div class="destination-grid">
-    <a href="seoul.html" class="destination">
-      <img src="img/서울/seoul.jpg" alt="서울">
-      <strong>서울</strong>
-    </a>
-    <a href="busan.html" class="destination">
-      <img src="img/부산/busan.jpg" alt="부산">
-      <strong>부산</strong>
-    </a>
-    <a href="daejeon.html" class="destination">
-      <img src="img/대전/daejeon.jpg" alt="대전">
-      <strong>대전</strong>
-    </a>
-  </div>
-</section>
+    const Icon = ({ name, className }) => {
+      useEffect(() => { lucide.createIcons(); }, [name]);
+      return <i data-lucide={name} className={className}></i>;
+    };
 
-<hr>
-<section id="recommendation-section">
-  <h2>오늘의 여행지 추천</h2>
-  <button onclick="recommendPlace()">오늘의 여행지는?</button>
+    const MainPage = () => {
+      const [currentSlide, setCurrentSlide] = useState(0);
+      const [recommended, setRecommended] = useState(null);
 
-  <div id="recommendation-box" class="hidden">
-    <a id="placeLink" href="#">
-      <img id="placeImage" src="" alt="추천 여행지 이미지">
-      <p id="placeName">여행지 이름</p>
-    </a>
-  </div>
-</section>
+      const slides = [
+        { img: "img/서울/seoul.jpg", title: "서울", desc: "전통과 현대가 공존하는 역동적인 수도" },
+        { img: "img/강원도/강릉.jpg", title: "강릉", desc: "푸른 바다와 커피 향 가득한 감성 도시" },
+        { img: "img/전라도/담양.png", title: "담양", desc: "대나무 숲 사이로 흐르는 고요한 휴식" },
+        { img: "img/제주도/제주.jpg", title: "제주도", desc: "에메랄드빛 바다와 신비로운 화산섬" }
+      ];
 
-<button id="btnTop">▲ 맨 위로</button>
+      const travelPlaces = [
+        { name: "서울", image: "img/서울/서울.jpg", link: "seoul.html", tag: "City" },
+        { name: "부산", image: "img/부산/부산.jpg", link: "busan.html", tag: "Ocean" },
+        { name: "제주도", image: "img/제주도/제주도.jpg", link: "jeju.html", tag: "Island" },
+        { name: "대전", image: "img/대전/대전.jpg", link: "daejeon.html", tag: "Tech" },
+        { name: "대구", image: "img/대구/대구.jpg", link: "daegu.html", tag: "City" },
+        { name: "광주", image: "img/광주/광주.jpg", link: "gwangju.html", tag: "Culture" },
+        { name: "인천", image: "img/인천/인천.jpg", link: "incheon.html", tag: "Airport" },
+        { name: "울산", image: "img/울산/울산.jpg", link: "ulsan.html", tag: "Ocean" },
+        { name: "세종", image: "img/세종/세종.jpg", link: "sejong.html", tag: "City" },
+        { name: "경기도", image: "img/경기도/경기도.jpg", link: "gyeonggi.html", tag: "Province" },
+        { name: "강원도", image: "img/강원도/강원도.jpg", link: "gangwon.html", tag: "Nature" },
+        { name: "충청도", image: "img/충청도/충청도.jpg", link: "chungcheong.html", tag: "Province" },
+        { name: "경상도", image: "img/경상도/경상도.jpg", link: "gyeongsang.html", tag: "Province" },
+        { name: "전라도", image: "img/전라도/전라도.jpg", link: "jeolla.html", tag: "Food" }
+      ];
 
-<script src="js/main.js" defer></script>
-  <script>
-    let currentSlide = 0;
-    const totalSlides = 4;
-    const track = document.getElementById('carousel-track');
-    const indicator = document.getElementById('slide-indicator');
+      const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
+      const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
-    function updateSlide() {
-      track.style.transform = `translateX(-${currentSlide * 100}%)`;
-      indicator.textContent = `${String(currentSlide + 1).padStart(2, '0')} / 04`;
-    }
-    setInterval(nextSlide, 4000);   // 4초마다 다음 슬라이드
+      useEffect(() => {
+        const timer = setInterval(nextSlide, 6000);
+        return () => clearInterval(timer);
+      }, []);
 
-    function nextSlide() {
-      currentSlide = (currentSlide + 1) % totalSlides;
-      updateSlide();
-    }
+      const recommendPlace = () => {
+        const random = travelPlaces[Math.floor(Math.random() * travelPlaces.length)];
+        setRecommended(random);
+      };
 
-    function prevSlide() {
-      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-      updateSlide();
-    }
+      return (
+        <div className="min-h-screen">
+          <header>
+            <div className="logo"><img src="logo.png" alt="로고" /></div>
+            <nav>
+              <ul>
+                <li><a href="/">| HOME |</a></li>
+                <li><a href="region.html">| 주요도시 |</a></li>
+                <li><a href="review_list.html">| 여행 후기 |</a></li>
+                <li><a href="guide.html">| 이용가이드 |</a></li>
+                <li><a href="qna.html">| Q&A |</a></li>
+                <li><a href="index.html">| 포트폴리오 |</a></li>
+              </ul>
+            </nav>
+          </header>
 
-    updateSlide();
-    const travelPlaces = [
-      { name: "서울", image: "img/서울/서울.jpg", link: "seoul.html" },
-      { name: "부산", image: "img/부산/부산.jpg", link: "busan.html" },
-      { name: "제주도", image: "img/제주도/제주도.jpg", link: "jeju.html" },
-      { name: "대구", image: "img/대구/대구.jpg", link: "daegu.html" },
-      { name: "대전", image: "img/대전/대전.jpg", link: "daejeon.html" },
-      { name: "광주", image: "img/광주/광주.jpg", link: "gwangju.html" },
-      { name: "울산", image: "img/울산/울산.jpg", link: "ulsan.html" },
-      { name: "세종", image: "img/세종/세종.jpg", link: "sejong.html" },
-      { name: "경기도", image: "img/경기도/경기도.jpg", link: "gyeonggi.html" },
-      { name: "강원도", image: "img/강원도/강원도.jpg", link: "gangwon.html" },
-      { name: "충청도", image: "img/충청도/충청도.jpg", link: "chungcheong.html" },
-      { name: "경상도", image: "img/경상도/경상도.jpg", link: "gyeongsang.html" },
-      { name: "전라도", image: "img/전라도/전라도.jpg", link: "jeolla.html" },
-      { name: "인천", image: "img/인천/인천.jpg", link: "incheon.html" }
-  ];
+          {/* [해결] mt-[80px]로 수정하여 헤더 높이와 정확히 맞춤 */}
+          <section className="relative h-[800px] mt-[80px] overflow-hidden group bg-slate-900">
+            {slides.map((s, i) => (
+              <div key={i} className={`absolute inset-0 slide-fade ${i === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}>
+                <img src={s.img} className="w-full h-full object-cover shadow-inner" alt={s.title} />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent" />
+                <div className="absolute bottom-32 left-1/2 -translate-x-1/2 text-center text-white w-full px-4">
+                  <h2 className="text-7xl font-bold mb-6 tracking-tighter drop-shadow-2xl">{s.title}</h2>
+                  <p className="text-2xl opacity-90 font-light max-w-2xl mx-auto">{s.desc}</p>
+                </div>
+              </div>
+            ))}
 
-function recommendPlace() {
-  const random = Math.floor(Math.random() * travelPlaces.length);
-  const place = travelPlaces[random];
+            <button onClick={prevSlide} className="absolute left-10 top-1/2 -translate-y-1/2 z-30 p-4 rounded-full bg-white/10 backdrop-blur-lg text-white border border-white/20 opacity-0 group-hover:opacity-100 transition-all hover:bg-white/30 active:scale-90 shadow-xl">
+              <Icon name="chevron-left" className="w-10 h-10" />
+            </button>
+            <button onClick={nextSlide} className="absolute right-10 top-1/2 -translate-y-1/2 z-30 p-4 rounded-full bg-white/10 backdrop-blur-lg text-white border border-white/20 opacity-0 group-hover:opacity-100 transition-all hover:bg-white/30 active:scale-90 shadow-xl">
+              <Icon name="chevron-right" className="w-10 h-10" />
+            </button>
 
-  document.getElementById('placeImage').src = place.image;
-  document.getElementById('placeName').innerText = place.name;
-  document.getElementById('placeLink').href = place.link;
+            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex gap-4 z-30">
+              {slides.map((_, i) => (
+                <button key={i} onClick={() => setCurrentSlide(i)} className={`h-2 transition-all duration-300 rounded-full ${i === currentSlide ? 'w-12 bg-white shadow-lg' : 'w-4 bg-white/30'}`} />
+              ))}
+            </div>
+          </section>
 
-  const box = document.getElementById('recommendation-box');
-  box.style.display = 'flex';
-}
+          <main className="max-w-7xl mx-auto px-6 py-24">
+            <div className="flex justify-between items-end mb-16">
+              <div>
+                <h2 className="text-4xl font-bold mb-4 tracking-tight">인기 TOP 3</h2>
+                <p className="text-slate-500 text-lg font-medium">여행자들이 가장 사랑하는 명소들을 만나보세요.</p>
+              </div>
+              <a href="region.html" className="bg-white border border-slate-200 px-6 py-3 rounded-2xl text-slate-700 font-semibold flex items-center gap-2 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all shadow-sm">
+                전체보기 <Icon name="chevron-right" className="w-4 h-4" />
+              </a>
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+              {travelPlaces.slice(0, 3).map((place, i) => (
+                <a href={place.link} key={i} className="group block">
+                  <div className="zoom-container shadow-2xl aspect-[3/4]">
+                    <img src={place.image} className="zoom-image w-full h-full object-cover" alt={place.name} />
+                  </div>
+                  <div className="mt-8">
+                    <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-lg uppercase tracking-[0.2em]">{place.tag}</span>
+                    <h3 className="text-3xl font-bold mt-4 group-hover:text-indigo-600 transition-colors flex items-center gap-3">
+                      {place.name} <Icon name="arrow-up-right" className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-all -translate-y-1" />
+                    </h3>
+                  </div>
+                </a>
+              ))}
+            </div>
 
+            <hr className="my-32 border-slate-200" />
+
+            <section className="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-[4rem] p-20 text-center text-white shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full -mr-48 -mt-48 blur-[100px]"></div>
+              <div className="relative z-10 max-w-2xl mx-auto">
+                <div className="w-20 h-20 bg-white/5 backdrop-blur-2xl rounded-3xl flex items-center justify-center mx-auto mb-8 border border-white/10 shadow-inner">
+                  <Icon name="sparkles" className="w-10 h-10 text-indigo-400" />
+                </div>
+                <h2 className="text-5xl font-bold mb-8 tracking-tight">완벽한 여행지를 찾으시나요?</h2>
+                <p className="text-slate-300 text-xl mb-12 leading-relaxed font-light">당신의 취향에 맞는 여행지를 알고리즘이 선정해 드립니다.</p>
+                <button onClick={recommendPlace} className="w-full py-6 bg-indigo-600 text-white rounded-3xl font-bold text-xl hover:bg-indigo-500 transition-all active:scale-95 shadow-2xl flex items-center justify-center gap-4">
+                  <Icon name="map-pin" className="w-7 h-7" /> 지금 추천 받기
+                </button>
+
+                {recommended && (
+                  <a href={recommended.link} className="block mt-16 p-3 bg-white/5 backdrop-blur-3xl rounded-[3rem] border border-white/10 animate-in fade-in zoom-in duration-700 shadow-3xl group/result overflow-hidden">
+                    <div className="zoom-container aspect-video mb-6">
+                      <img src={recommended.image} className="zoom-image w-full h-full object-cover" alt={recommended.name} />
+                    </div>
+                    <div className="pb-8 text-center text-white">
+                      <h4 className="text-4xl font-bold mb-3 tracking-tight">"{recommended.name}"</h4>
+                      <p className="text-indigo-300 text-lg font-medium flex items-center justify-center gap-2 group-hover/result:text-white transition-colors">
+                        상세 정보 보러가기 <Icon name="arrow-right" className="w-5 h-5 group-hover/result:translate-x-2 transition-transform" />
+                      </p>
+                    </div>
+                  </a>
+                )}
+              </div>
+            </section>
+          </main>
+
+          <footer className="bg-slate-950 text-slate-500 py-20 px-6 text-center text-sm border-t border-slate-900">
+            <div className="flex items-center justify-center gap-2 mb-6 text-slate-300">
+                <Icon name="map" className="w-6 h-6" />
+                <span className="font-bold tracking-widest uppercase text-lg">K-TRAVEL</span>
+            </div>
+            <p>© 2025 Premium Travel Guide. Cinematic Web Application.</p>
+          </footer>
+
+          <button onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} className="fixed bottom-12 right-12 p-6 bg-white border border-slate-200 shadow-3xl rounded-3xl hover:-translate-y-2 transition-all active:scale-90 group z-50">
+            <Icon name="arrow-up" className="w-7 h-7 text-slate-900 group-hover:text-indigo-600" />
+          </button>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<MainPage />);
   </script>
 </body>
 </html>

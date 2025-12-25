@@ -1,194 +1,236 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Q&A 게시판</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Q&A 게시판</title>
+  
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Inter', 'Noto Sans KR', sans-serif; margin: 0; padding: 0; }
     
-    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    /* [규격 통일] 상단 헤더 80px / 회색 배경 */
+    header {
+      background-color: #cecbcb !important;
+      height: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 40px;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      border-bottom: 1px solid #eee;
+    }
+    .logo img { height: 55px; }
+    nav ul { list-style: none; display: flex; gap: 24px; margin: 0; padding: 0; }
+    nav a { text-decoration: none; color: #222; font-size: 0.9rem; font-weight: 500; }
 
-    <style>
-        /* [전체 공통 스타일] */
-        body { margin: 0; padding: 0; background-color: #f4f6f8; font-family: 'Noto Sans KR', sans-serif; }
-        ul, li { list-style: none; margin: 0; padding: 0; }
-        a { text-decoration: none; color: #333; }
+    /* 프리미엄 카드 디자인 */
+    .premium-card {
+      background: white;
+      border: 1px solid #f1f5f9;
+      border-radius: 2rem;
+      transition: all 0.3s ease;
+    }
+    .premium-card:hover { transform: translateY(-4px); box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.05); }
 
-        /* [상단 헤더 스타일] */
-        .main-header {
-            background-color: #cccccc; /* 회색 배경 */
-            padding: 15px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #bbb;
-        }
-
-        .header-logo img {
-            height: 40px;
-            vertical-align: middle;
-        }
-
-        /* 메뉴 가로 정렬 */
-        .header-nav {
-            display: flex; 
-            gap: 15px;
-        }
-        
-        .header-nav li {
-            display: inline-block;
-        }
-
-        .header-nav a {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #333;
-            transition: color 0.2s;
-        }
-
-        .header-nav a:hover {
-            color: #000;
-        }
-    </style>
+    .input-style {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 1rem;
+      padding: 12px 16px;
+      width: 100%;
+      transition: all 0.2s;
+    }
+    .input-style:focus { outline: none; border-color: #6366f1; background-color: white; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+  </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-900">
 
-    <header class="main-header">
-        <div class="header-logo">
-            <a href="main.html">
-                <img src="logo.png" alt="easy trip" onerror="this.style.display='none'; this.parentNode.innerHTML='<b>easy trip</b>'">
-            </a>
-        </div>
+  <div id="root"></div>
 
-        <ul class="header-nav">
-            <li><a href="main.html">| HOME |</a></li>
-            <li><a href="region.html">| 주요도시 |</a></li>
-            <li><a href="review_list.html">| 여행 후기 |</a></li>
-            <li><a href="guide.html">| 이용가이드 |</a></li>
-            <li><a href="qna.html">| Q&A |</a></li>
-            <li><a href="index.html">| 포트폴리오 |</a></li>
-        </ul>
-    </header>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
 
+    const Icon = ({ name, className }) => {
+      useEffect(() => { lucide.createIcons(); }, [name]);
+      return <i data-lucide={name} className={className}></i>;
+    };
 
-    <div id="root"></div>
+    const QnaApp = () => {
+      const API_BASE = "http://localhost:3000";
+      const [list, setList] = useState([]);
+      const [inputs, setInputs] = useState({
+        region: "지역 선택",
+        category: "분류 선택",
+        title: "",
+        content: ""
+      });
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-        const API_BASE = "http://localhost:3000";
+      const regions = ["서울", "경기", "인천", "강원", "충청", "대전", "세종", "전라", "광주", "경상", "대구", "부산", "울산", "제주"];
 
-        const styles = {
-            container: {
-                width: "100%", maxWidth: "1000px", margin: "40px auto", padding: "0 20px", boxSizing: "border-box"
-            },
-            card: {
-                backgroundColor: "white", padding: "30px", borderRadius: "10px",
-                boxShadow: "0 2px 10px rgba(0,0,0,0.05)", marginBottom: "20px", border: "1px solid #eee"
-            },
-            button: {
-                backgroundColor: "#555",
-                color: "white", padding: "12px 0", border: "none",
-                borderRadius: "4px", fontSize: "1rem", fontWeight: "bold", cursor: "pointer", width: "100%"
-            }
-        };
+      useEffect(() => {
+        fetchList();
+      }, []);
 
-        const Qna = () => {
-            const [list, setList] = useState([]);
-            // const [users, setUsers] = useState([]); // 유저 목록 불러오기 삭제 (필요 없음)
-            // const [currentUser, setCurrentUser] = useState("익명"); // 작성자 선택 상태 삭제
-            const [inputs, setInputs] = useState({ region: "지역 선택", category: "분류 선택", title: "", content: "" });
-            const regions = ["서울", "경기", "인천", "강원", "충청", "대전", "세종", "전라", "광주", "경상", "대구", "부산", "울산", "제주"];
+      const fetchList = async () => {
+        try {
+          const res = await fetch(`${API_BASE}/api/qna`);
+          const data = await res.json();
+          setList(Array.isArray(data) ? data : []);
+        } catch (err) { console.error("게시글 로드 실패", err); }
+      };
 
-            useEffect(() => { fetchList(); }, []); // fetchUsers 제거
+      const handleChange = (e) => {
+        const { name, value } = e.target;
+        setInputs({ ...inputs, [name]: value });
+      };
 
-            const fetchList = async () => {
-                try {
-                    const res = await fetch(`${API_BASE}/api/qna`);
-                    const data = await res.json();
-                    setList(Array.isArray(data) ? data : []);
-                } catch (err) { console.error(err); }
-            };
+      const handleSubmit = async () => {
+        if (inputs.region === "지역 선택" || inputs.category === "분류 선택" || !inputs.title || !inputs.content) {
+          alert("모든 항목을 입력해주세요.");
+          return;
+        }
+        try {
+          const res = await fetch(`${API_BASE}/api/qna`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...inputs, writer: "익명" })
+          });
+          if (res.ok) {
+            alert("질문이 성공적으로 등록되었습니다!");
+            setInputs({ region: "지역 선택", category: "분류 선택", title: "", content: "" });
+            fetchList();
+          }
+        } catch (err) { alert("서버 연결 실패"); }
+      };
 
-            const handleChange = (e) => {
-                const { name, value } = e.target;
-                setInputs({ ...inputs, [name]: value });
-            };
+      return (
+        <div className="min-h-screen">
+          <header>
+            <div className="logo"><img src="logo.png" alt="로고" /></div>
+            <nav>
+              <ul>
+                <li><a href="main.html">| HOME |</a></li>
+                <li><a href="region.html">| 주요도시 |</a></li>
+                <li><a href="review_list.html">| 여행 후기 |</a></li>
+                <li><a href="guide.html">| 이용가이드 |</a></li>
+                <li><a href="qna.html" className="font-bold text-indigo-700">| Q&A |</a></li>
+                <li><a href="index.html">| 포트폴리오 |</a></li>
+              </ul>
+            </nav>
+          </header>
 
-            const handleSubmit = async () => {
-                if (inputs.region === "지역 선택" || inputs.category === "분류 선택" || !inputs.title || !inputs.content) {
-                    alert("모든 항목을 입력해주세요."); return;
-                }
-                try {
-                    const res = await fetch(`${API_BASE}/api/qna`, {
-                        method: "POST", headers: { "Content-Type": "application/json" },
-                        // ★ [핵심 수정] writer를 무조건 "익명"으로 고정해서 보냄
-                        body: JSON.stringify({ ...inputs, writer: "익명" })
-                    });
-                    if (res.ok) {
-                        alert("등록되었습니다.");
-                        setInputs({ region: "지역 선택", category: "분류 선택", title: "", content: "" });
-                        fetchList();
-                    }
-                } catch (err) { alert("서버 연결 실패"); }
-            };
+          <main className="pt-[140px] pb-20 px-6 max-w-4xl mx-auto">
+            <div className="text-center mb-16 animate-in fade-in duration-700">
+              <h1 className="text-5xl font-bold tracking-tighter mb-4 italic text-slate-900">Q&A</h1>
+              <p className="text-slate-500 text-lg font-medium">여행에 대해 궁금한 점을 자유롭게 질문하세요.</p>
+            </div>
 
-            return (
-                <div style={styles.container}>
-                    <div style={{ textAlign: "center", marginBottom: "30px" }}>
-                        <h2 style={{ fontSize: "2rem", color: "#333", margin: 0 }}>Q&A 게시판</h2>
-                    </div>
-
-                    {/* 사용자 선택 및 입력 폼 */}
-                    <div style={styles.card}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                            <span style={{ fontSize: "1.1rem", fontWeight: "bold" }}>질문 작성</span>
-                            
-                            {/* ★ [삭제됨] 여기에 있던 작성자 선택(select) 박스를 지웠습니다. */}
-                            
-                        </div>
-
-                        <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                            <select name="region" value={inputs.region} onChange={handleChange} style={inputStyle}>
-                                <option>지역 선택</option>{regions.map(r => <option key={r} value={r}>{r}</option>)}
-                            </select>
-                            <select name="category" value={inputs.category} onChange={handleChange} style={inputStyle}>
-                                <option>분류 선택</option><option>관광지</option><option>맛집</option><option>교통</option><option>기타</option>
-                            </select>
-                        </div>
-                        <input type="text" name="title" placeholder="제목" value={inputs.title} onChange={handleChange} style={{...inputStyle, width: "100%", boxSizing: "border-box"}} />
-                        <textarea name="content" placeholder="내용을 입력하세요" value={inputs.content} onChange={handleChange} style={{...inputStyle, width: "100%", height: "150px", resize: "none", boxSizing: "border-box"}}></textarea>
-                        
-                        <button onClick={handleSubmit} style={styles.button}>질문 등록</button>
-                    </div>
-
-                    {/* 목록 */}
-                    <div style={{ marginTop: "40px" }}>
-                        <h3 style={{ borderBottom: "2px solid #333", paddingBottom: "10px", margin: "0 0 20px 0", color: "#333" }}>최근 질문</h3>
-                        {list.length === 0 ? <div style={{ textAlign: "center", padding: "50px", color: "#999" }}>질문이 없습니다.</div> : 
-                            list.map((item, index) => (
-                                <div key={index} style={{ backgroundColor: "white", padding: "20px", borderRadius: "10px", marginBottom: "15px", boxShadow: "0 2px 5px rgba(0,0,0,0.05)" }}>
-                                    <div style={{ display: "flex", gap: "8px", marginBottom: "8px", fontSize: "0.85rem" }}>
-                                        <span style={badgeStyle}>{item.region}</span>
-                                        <span style={badgeStyle}>{item.category}</span>
-                                        <span style={{ color: "#333", fontWeight: "bold" }}>{item.writer}</span>
-                                        <span style={{ marginLeft: "auto", color: "#aaa" }}>{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ""}</span>
-                                    </div>
-                                    <div style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "6px", color: "#333" }}>{item.title}</div>
-                                    <div style={{ color: "#555" }}>{item.content}</div>
-                                </div>
-                            ))
-                        }
-                    </div>
+            {/* 질문 등록 폼 */}
+            <section className="premium-card p-10 mb-20 shadow-sm border-t-8 border-t-indigo-600">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-400 ml-2 uppercase tracking-widest">Region</label>
+                  <select name="region" value={inputs.region} onChange={handleChange} className="input-style font-semibold text-slate-700">
+                    <option value="지역 선택">지역 선택</option>
+                    {regions.map((r) => <option key={r} value={r}>{r}</option>)}
+                  </select>
                 </div>
-            );
-        };
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-400 ml-2 uppercase tracking-widest">Category</label>
+                  <select name="category" value={inputs.category} onChange={handleChange} className="input-style font-semibold text-slate-700">
+                    <option value="분류 선택">분류 선택</option>
+                    <option value="관광지">관광지</option>
+                    <option value="맛집">맛집</option>
+                    <option value="교통">교통</option>
+                    <option value="기타">기타</option>
+                  </select>
+                </div>
+              </div>
 
-        const inputStyle = { padding: "12px", border: "1px solid #ddd", borderRadius: "6px", fontSize: "1rem", outline: "none", flex: 1 };
-        const badgeStyle = { backgroundColor: "#eee", color: "#555", padding: "4px 10px", borderRadius: "12px", fontWeight: "500" };
+              <div className="space-y-2 mb-6">
+                <label className="text-xs font-bold text-slate-400 ml-2 uppercase tracking-widest">Title</label>
+                <input 
+                  type="text" name="title" placeholder="제목을 입력하세요" 
+                  value={inputs.title} onChange={handleChange} 
+                  className="input-style text-lg font-bold"
+                />
+              </div>
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<Qna />);
-    </script>
+              <div className="space-y-2 mb-8">
+                <label className="text-xs font-bold text-slate-400 ml-2 uppercase tracking-widest">Content</label>
+                <textarea 
+                  name="content" placeholder="궁금한 내용을 상세히 적어주세요." 
+                  value={inputs.content} onChange={handleChange} 
+                  className="input-style h-48 resize-none leading-relaxed"
+                />
+              </div>
+
+              <button 
+                onClick={handleSubmit} 
+                className="w-full py-5 bg-indigo-600 text-white rounded-[1.5rem] font-bold text-xl hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-100 flex items-center justify-center gap-3"
+              >
+                <Icon name="send" className="w-6 h-6" /> 질문 등록하기
+              </button>
+            </section>
+
+            {/* 질문 목록 */}
+            <div className="space-y-8">
+              <div className="flex items-center gap-4 mb-8">
+                <h2 className="text-2xl font-bold tracking-tight">최근 질문 목록</h2>
+                <div className="flex-grow h-[1px] bg-slate-200"></div>
+              </div>
+
+              {list.length === 0 ? (
+                <div className="text-center py-20 bg-white rounded-[3rem] border border-dashed border-slate-300">
+                  <p className="text-slate-400 font-medium">아직 등록된 질문이 없습니다.</p>
+                </div>
+              ) : (
+                list.map((item, index) => (
+                  <div key={index} className="premium-card p-8 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{animationDelay: `${index * 100}ms`}}>
+                    <div className="flex justify-between items-center mb-6">
+                      <div className="flex gap-2">
+                        <span className="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest">{item.region}</span>
+                        <span className="bg-slate-100 text-slate-500 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest">{item.category}</span>
+                      </div>
+                      <span className="text-xs text-slate-400 font-medium">
+                        {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ""}
+                      </span>
+                    </div>
+                    <h3 className="text-2xl font-bold text-slate-900 mb-4 tracking-tight">{item.title}</h3>
+                    <p className="text-slate-600 leading-relaxed mb-8">{item.content}</p>
+                    
+                    <div className="pt-6 border-t border-slate-50 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-white text-xs font-bold">익</div>
+                        <span className="text-sm font-bold text-slate-800">익명 사용자</span>
+                      </div>
+                      {/* 답변 버튼이 제거되었습니다 */}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </main>
+
+          <footer className="py-20 border-t border-slate-200 text-center text-sm text-slate-400 bg-white">
+            <p>© 2025 여행가자. Premium Travel Guide.</p>
+          </footer>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<QnaApp />);
+  </script>
 </body>
 </html>

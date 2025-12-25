@@ -3,41 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>여행 후기</title>
+  <title>REVIEW</title>
 
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/review_list.css">
-  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+
   <style>
-    /* 삭제 버튼 스타일 추가 */
-    .delete-btn {
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.9em;
-      transition: background 0.3s;
+    body { font-family: 'Inter', 'Noto Sans KR', sans-serif; }
+    
+    /* 헤더 스타일 고정 */
+    header {
+      background-color: #cecbcb !important;
+      height: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 40px;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      border-bottom: 1px solid #eee;
     }
-    .delete-btn:hover {
-      background-color: #c0392b;
+    .logo img { height: 55px; }
+    nav ul { list-style: none; display: flex; gap: 24px; margin: 0; padding: 0; }
+    nav a { text-decoration: none; color: #222; font-size: 0.9rem; font-weight: 500; }
+
+    /* 카드 애니메이션 */
+    .review-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .review-actions {
-      text-align: right;
-      margin-top: 10px;
+    .review-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     }
+
+    /* 이미지 박스 줌 효과 */
+    .img-zoom { overflow: hidden; border-radius: 0.75rem; }
+    .img-zoom img { transition: transform 0.5s ease; }
+    .review-card:hover .img-zoom img { transform: scale(1.1); }
+
+    html { scroll-behavior: smooth; }
   </style>
 </head>
+<body class="bg-slate-50 text-slate-900">
 
-<body>
   <header>
     <div class="logo"><img src="logo.png" alt="로고"></div>
     <nav>
       <ul>
         <li><a href="main.html">| HOME |</a></li>
         <li><a href="region.html">| 주요도시 |</a></li>
-        <li><a href="review_list.html">| 여행 후기 |</a></li>
+        <li><a href="review_list.html" class="font-bold text-indigo-700">| 여행 후기 |</a></li>
         <li><a href="guide.html">| 이용가이드 |</a></li>
         <li><a href="qna.html">| Q&A |</a></li>
         <li><a href="index.html">| 포트폴리오 |</a></li>
@@ -45,16 +63,20 @@
     </nav>
   </header>
 
-  <main class="review-list-page">
-    <section class="review-list-card">
-      <div class="review-list-header">
-        <h1>REAL REVIEW</h1>
-        <p>여행자들의 생생한 후기를 만나보세요.</p>
+  <main class="pt-[140px] pb-20 px-6 max-w-4xl mx-auto"> <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 animate-in fade-in slide-in-from-top-4 duration-700">
+      <div>
+        <h1 class="text-5xl font-bold tracking-tighter mb-4">REVIEW</h1>
+        <p class="text-slate-500 text-lg font-medium">여행자들의 생생한 기록, 다음 여정의 영감이 됩니다.</p>
       </div>
+      <a href="review.html" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-indigo-500 transition-all shadow-lg flex items-center gap-2">
+        <i data-lucide="pen-tool" class="w-5 h-5"></i> 후기 작성하기
+      </a>
+    </div>
 
-      <div class="filter-bar">
-        <label for="filterRegion">지역별 보기</label>
-        <select id="filterRegion">
+    <div class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-200 mb-10 flex flex-wrap items-center gap-4">
+      <div class="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100 w-full md:w-auto">
+        <i data-lucide="map-pin" class="w-4 h-4 text-indigo-500"></i>
+        <select id="filterRegion" class="bg-transparent border-none focus:ring-0 text-sm font-bold text-slate-700 cursor-pointer">
           <option value="">전체 지역</option>
           <option value="서울">서울</option><option value="인천">인천</option><option value="대전">대전</option>
           <option value="대구">대구</option><option value="광주">광주</option><option value="부산">부산</option>
@@ -63,124 +85,118 @@
           <option value="제주도">제주도</option><option value="세종">세종</option>
         </select>
       </div>
+      <p id="reviewCount" class="ml-auto text-sm text-slate-400 font-medium px-4">총 0개의 후기</p>
+    </div>
 
-      <a href="review.html" class="write-btn">후기 작성하기</a>
-
-      <div id="reviewList" class="review-list">
-        </div>
-    </section>
+    <div id="reviewList" class="grid grid-cols-1 gap-8">
+      </div>
   </main>
+
+  <footer class="py-12 border-t border-slate-200 text-center text-sm text-slate-400">
+    <p>© 2025 여행가자. Real Moments, Real Memories.</p>
+  </footer>
 
 <script>
   const API_BASE = "http://localhost:3000";
+  let allReviews = [];
+
+  function initIcons() { lucide.createIcons(); }
 
   async function fetchReviews() {
-    const container = document.getElementById('reviewListContainer'); 
-    // (위 ID는 실제 html에 있는 목록 담는 div id여야 합니다. 
-    // 혹시 id가 다르다면 확인해주세요. 보통 'review-list' 등으로 되어있을 수 있습니다.)
-    
-    // 만약 container를 못 찾으면 에러 나니까 안전장치
-    const listElement = document.querySelector('.review-list') || document.getElementById('reviewList');
-    
-    if (!listElement) {
-        console.error("리뷰 목록을 넣을 div를 찾지 못했습니다.");
-        return;
-    }
-    
-    // 초기화
-    listElement.innerHTML = "<p>로딩 중...</p>";
-
+    const listElement = document.getElementById('reviewList');
+    listElement.innerHTML = `
+      <div class="col-span-full py-20 text-center">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent"></div>
+        <p class="mt-4 text-slate-500 font-medium">여행 정보를 불러오고 있습니다...</p>
+      </div>
+    `;
     try {
-      // 1. 서버에서 리뷰 데이터 가져오기
       const res = await fetch(`${API_BASE}/api/reviews`);
-      const reviews = await res.json();
-
-      listElement.innerHTML = ""; // 로딩 글씨 지우기
-
-      if (reviews.length === 0) {
-        listElement.innerHTML = "<p>등록된 리뷰가 없습니다.</p>";
-        return;
-      }
-
-      // 2. 리뷰 하나씩 화면에 그리기
-      reviews.forEach(review => {
-        
-        // ★ [핵심] 사진이 있는지 확인하는 코드
-        // DB에 image_path가 있으면 <img> 태그를 만들고, 없으면 빈칸('')으로 둡니다.
-        let imageHtml = '';
-        if (review.image_path) {
-            imageHtml = `
-              <div style="margin-top: 10px;">
-                <img src="${API_BASE}${review.image_path}" 
-                     alt="여행 사진" 
-                     style="max-width: 150px; height: auto; border-radius: 8px; border: 1px solid #ddd;">
-              </div>
-            `;
-        }
-
-        // 별점(숫자) -> 별 모양(★)으로 바꾸기
-        const starStr = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
-        const dateStr = new Date(review.created_at).toLocaleString();
-
-        // HTML 조립
-        const html = `
-          <div class="review-item" style="border: 1px solid #eee; padding: 15px; margin-bottom: 15px; border-radius: 10px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <div>
-                <span style="background: #eef; color: #33a; padding: 3px 8px; border-radius: 4px; font-size: 0.8em; margin-right: 5px;">
-                  ${review.region}
-                </span>
-                <span style="color: #f39c12; font-weight: bold;">${starStr}</span>
-              </div>
-              <div style="font-size: 0.8em; color: #888;">${dateStr}</div>
-            </div>
-
-            <div style="font-weight: bold; margin-bottom: 5px;">${review.content}</div>
-            
-            ${imageHtml}
-
-            <div style="margin-top: 10px; font-size: 0.9em; color: #666; display: flex; justify-content: space-between;">
-              <span>작성자: <strong>${review.nickname || review.writerId || '익명'}</strong></span>
-              <button onclick="deleteReview(${review.id})" style="background: #ff5555; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">삭제</button>
-            </div>
-          </div>
-        `;
-
-        listElement.insertAdjacentHTML('beforeend', html);
-      });
-
+      allReviews = await res.json();
+      renderReviews(allReviews);
     } catch (err) {
       console.error(err);
-      listElement.innerHTML = "<p>리뷰를 불러오는 데 실패했습니다.</p>";
+      listElement.innerHTML = "<p class='col-span-full py-20 text-center text-red-500 font-bold'>서버 연결에 실패했습니다.</p>";
     }
   }
 
-  // 삭제 기능 (기존 유지)
-  async function deleteReview(id) {
-    const password = prompt("리뷰 삭제를 위해 비밀번호를 입력해주세요.");
-    if (!password) return;
+  function renderReviews(reviewsToRender) {
+    const listElement = document.getElementById('reviewList');
+    const countElement = document.getElementById('reviewCount');
+    listElement.innerHTML = "";
+    countElement.innerText = `총 ${reviewsToRender.length}개의 후기`;
 
+    if (reviewsToRender.length === 0) {
+      listElement.innerHTML = `
+        <div class="col-span-full py-20 text-center bg-white rounded-[3rem] border border-dashed border-slate-300">
+          <p class="text-slate-400 font-medium text-lg">해당하는 여행 후기가 아직 없네요.</p>
+        </div>
+      `;
+      return;
+    }
+
+    reviewsToRender.forEach((review, index) => {
+      const rating = review.rating || 0;
+      const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+      const date = review.created_at ? new Date(review.created_at).toLocaleDateString() : 'Unknown';
+      
+      const card = `
+        <div class="review-card bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500" style="animation-delay: ${index * 100}ms">
+          <div class="flex justify-between items-start mb-6">
+            <span class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-sm font-bold uppercase tracking-widest">${review.region}</span>
+            <span class="text-amber-400 font-bold text-base tracking-widest">${stars}</span>
+          </div>
+
+          ${review.image_path ? `
+            <div class="img-zoom mb-8 aspect-video rounded-2xl border border-slate-100">
+              <img src="${API_BASE}${review.image_path}" class="w-full h-full object-cover" alt="Review Image">
+            </div>
+          ` : ''}
+
+          <p class="text-slate-800 font-medium text-lg leading-relaxed mb-8 flex-grow whitespace-pre-wrap">"${review.content}"</p>
+
+          <div class="pt-6 border-t border-slate-50 flex items-center justify-between mt-auto">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                ${(review.nickname || '익').substring(0,1)}
+              </div>
+              <div class="flex flex-col">
+                <span class="text-sm font-bold text-slate-900">${review.nickname || '익명 여행자'}</span>
+                <span class="text-xs text-slate-400">${date}</span>
+              </div>
+            </div>
+            <button onclick="deleteReview(${review.id})" class="text-slate-300 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-50">
+              <i data-lucide="trash-2" class="w-5 h-5"></i>
+            </button>
+          </div>
+        </div>
+      `;
+      listElement.insertAdjacentHTML('beforeend', card);
+    });
+    initIcons();
+  }
+
+  document.getElementById('filterRegion').addEventListener('change', function() {
+    const selected = this.value;
+    const filtered = selected === "" ? allReviews : allReviews.filter(r => r.region === selected);
+    renderReviews(filtered);
+  });
+
+  async function deleteReview(id) {
+    const password = prompt("삭제를 위해 비밀번호를 입력해주세요.");
+    if (!password) return;
     try {
       const res = await fetch(`${API_BASE}/api/reviews/${id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
       });
-      const data = await res.json();
-      
-      if (res.ok) {
-        alert("삭제되었습니다.");
-        fetchReviews(); // 목록 새로고침
-      } else {
-        alert(data.message);
-      }
-    } catch (err) {
-      alert("삭제 중 오류 발생");
-    }
+      if (res.ok) { alert("성공적으로 삭제되었습니다."); fetchReviews(); } 
+      else { const data = await res.json(); alert(data.message || "삭제 실패"); }
+    } catch (err) { alert("서버 연결 오류"); }
   }
 
-  // 페이지 열리면 실행
-  document.addEventListener('DOMContentLoaded', fetchReviews);
+  document.addEventListener('DOMContentLoaded', () => { fetchReviews(); initIcons(); });
 </script>
 </body>
 </html>

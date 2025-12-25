@@ -1,6 +1,6 @@
 /* main.css */
 
-
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+KR:wght@400;700&display=swap');
 * {
   margin: 0;
   padding: 0;
@@ -8,39 +8,43 @@
 }
 
 body {
-  font-family: 'Noto Sans KR', sans-serif;
-  background-color: #fff;
-  color: #222;
+  font-family: 'Inter', 'Noto Sans KR', sans-serif;
+  background-color: #f8fafc; 
+  color: #0f172a;
 }
 
-/* Header */
+/* 모든 페이지 공통 슬림 헤더 */
 header {
-  background-color: #cecbcb;
+  background-color: #cecbcb !important;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0px 40px;
-  border-bottom: solid #eee;
+  padding: 0 40px;
+  height: 80px; /* 80px로 통일 */
+  width: 100%;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid #eee;
 }
-
 .logo img {
-  height: 74px;
+  height: 65px; /* 로고 높이 통일 */
 }
-
 nav ul {
   list-style: none;
   display: flex;
   gap: 24px;
-  margin: 0;
 }
-
 nav a {
   text-decoration: none;
   color: #222;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
 }
-
+.container {
+  margin-top: 80px; 
+  padding: 40px 20px;
+}
 /* Carousel */
 .carousel {
   display: flex;

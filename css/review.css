@@ -57,7 +57,7 @@ body {
 
 .review-form-card select:focus,
 .review-form-card textarea:focus {
-  border-color: #006644;
+  border-color:#6c757d;
   background: #ffffff;
 }
 
@@ -87,7 +87,7 @@ body {
   padding: 13px 0;
   border: none;
   border-radius: 999px;
-  background: #006644;
+  background: #6c757d;
   color: #ffffff;
   font-size: 15px;
   font-weight: 600;
@@ -96,7 +96,7 @@ body {
 }
 
 .submit-btn:hover {
-  background: #005137;
+  background: #6c757d;
 }
 
 .submit-btn:active {
